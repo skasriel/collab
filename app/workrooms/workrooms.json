@@ -1,0 +1,22 @@
+[
+    {
+        "name": "general",
+        "numMessages": "100"
+    },
+
+  {
+      "name": "random",
+      "numMessages": "1230"
+  },
+
+  {
+      "name": "product",
+      "numMessages": "33"
+  },
+
+{
+    "name": "engineering",
+    "numMessages": "73"
+}
+
+]

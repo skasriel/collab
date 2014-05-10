@@ -1,0 +1,13 @@
+<h1>{{workroom.workroomId}}</h1>
+
+
+<ul">
+  <li ng-repeat="message in messages">
+    {{message.message}}
+  </li>
+</ul>
+
+<hr/>
+<p>
+{{messages | json}}
+</p>
