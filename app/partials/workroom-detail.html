@@ -1,13 +1,42 @@
-<h1>{{workroom.workroomId}}</h1>
+<br>
+<br>
+<br>
+<h2>#{{workroomName}}</h2>
 
-
+<a href="#/workrooms/{{workroomId}}/users">Users...</a>
 <ul">
   <li ng-repeat="message in messages">
-    {{message.message}}
+    {{message.html}} ({{message.author_name}})
   </li>
 </ul>
 
+
+
+<!-- text area to enter a new message -->
+<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+  <div class="row">
+    <div class="container">
+      <div class="col-md-3"></div>
+      <div class="col-md-8">
+        <div class="container">
+          <form ng-controller="AddMessageController" class="form-inline" role="form">
+            <div class="form-group">
+                  <input type="textarea" class="form-control" ng-model="message" placeholder="Type your message here..." size="40">
+            </div>
+            <button type="button" class="btn btn-primary" ng-click='PostMessage();'>Send</button>
+          </form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+<!--
+
+<br><br><br>
 <hr/>
 <p>
 {{messages | json}}
 </p>
+-->

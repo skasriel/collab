@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+
+<html lang="en" ng-app="workplaceApp" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Workplace App</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
+  <link rel="stylesheet" href="css/app.css"/>
+  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+
+<body ng-controller="WorkroomCtrl">
+
+  <!-- top nav -->
+   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">The Workplace</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form" action="/api/logout" method="get">
+            <div ng-controller="CurrentUserCtrl" class="text-muted">
+              <li ng-repeat="user in active_user">
+                Logged in as: {{user}}
+              </li>
+            </div>
+            <button type="submit" class="btn btn-default">Logout</button>
+          </form>
+
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+
+
+    <!-- list of workrooms -->
+    <div class="row">
+      <div class="container">
+        <div class="col-md-3 bs-sidebar" height="100%">
+          <div class="container-fluid">
+            <div class="row-fluid">
+              <div class="span2">
+                <br><br><br>
+                <h1>Elance-oDesk</h1>
+              </div>
+            </div>
+            <div class="row-fluid">
+              <div class="span2">
+                <!--Sidebar content-->
+                <br>
+                Search: <input ng-model="query" placeholder="Search..." size="8">
+
+              </div>
+              <div class="span10">
+                <ul class="nav nav-pills nav-stacked bs-sidenav">
+                  <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query">
+                    <a href="#/workrooms/{{workroom._id}}">#{{workroom.name}} ({{workroom.messages.length}})</a> <!-- | {{Date(workroom.modified)}} -->
+                  </li>
+                </ul>
+
+                <!-- Add new workroom -->
+                <a href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Add... </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="col-md-8">
+          <div ng-view></div>
+        </div>
+      </div>
+
+
+<!-- Add workroom modal -->
+<div class="modal fade" id="AddWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="AddWorkroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="AddWorkroomController" class="form-inline" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="AddWorkroomModalLabel">Create new workroom</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+              <input type="text" class="form-control" ng-model="workroomName" placeholder="Workroom name" size="40">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click='CreateWorkroom();'>Create workroom</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Invite user modal -->
+<div class="modal fade" id="InviteUserModal" tabindex="-1" role="dialog" aria-labelledby="InviteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="InviteUserController" class="form-inline" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="InviteUserModalLabel">Invite to workroom</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+              <input type="text" class="form-control" ng-model="inviteUserName" placeholder="Type or select the names of team members that you would like to invite:" size="40">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click='InviteUser();'>Invite user</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+  <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="js/services.js"></script>
+  <script src="bower_components/angular-resource/angular-resource.js"></script>
+
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+</body>
+</html>

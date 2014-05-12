@@ -1,6 +1,6 @@
 'use strict';
 
-/* Services */
+/* Workroom Services */
 var workroomServices = angular.module('workroomServices', ['ngResource']);
 
 workroomServices.factory('Workroom', ['$resource',
@@ -9,3 +9,12 @@ workroomServices.factory('Workroom', ['$resource',
       query: {method:'GET', params:{workroomId:'workrooms'}, isArray:true}
     });
   }]);
+
+/*
+workroomServices.factory('WorkroomUsers', ['$resource',
+  function($resource) {
+    return $resource('workrooms/:workroomId-users.json', {}, {
+      query: {method:'GET', params:{workroomId:'workrooms'}, isArray:true}
+    });
+  }]);
+*/

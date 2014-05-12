@@ -1,0 +1,26 @@
+<br>
+<br>
+<h1>Users in #{{workroomId}}:</h1>
+<ul">
+  <a href="#/workrooms/{{workroomId}}">Back to room</a>
+  <li ng-repeat="user in users">
+    {{user.username}}  ({{user.displayname}})
+  </li>
+</ul>
+
+
+<!-- Invite user to this workroom -->
+<a href="#/workrooms/{{workroomId}}/users" data-toggle="modal" data-target="#InviteUserModal"> + Invite... </a>
+
+
+
+
+
+<!--
+<br><br><br>
+
+<hr/>
+<p>
+{{users | json}}
+</p>
+-->
