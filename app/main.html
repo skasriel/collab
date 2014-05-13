@@ -16,9 +16,7 @@
   <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
   <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
   <link rel="stylesheet" href="css/app.css"/>
-  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="bower_components/select2/select2.css">
 </head>
 
 <body ng-controller="WorkroomCtrl">
@@ -38,9 +36,7 @@
         <div class="navbar-collapse collapse">
           <form class="navbar-form navbar-right" role="form" action="/api/logout" method="get">
             <div ng-controller="CurrentUserCtrl" class="text-muted">
-              <li ng-repeat="user in active_user">
-                Logged in as: {{user}}
-              </li>
+                Logged in as: {{active_user}}
             </div>
             <button type="submit" class="btn btn-default">Logout</button>
           </form>
@@ -70,14 +66,19 @@
 
               </div>
               <div class="span10">
-                <ul class="nav nav-pills nav-stacked bs-sidenav">
+                <ul class="nav nav-pills nav-stacked bs-sidenav list-unstyled">
                   <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query">
                     <a href="#/workrooms/{{workroom._id}}">#{{workroom.name}} ({{workroom.messages.length}})</a> <!-- | {{Date(workroom.modified)}} -->
                   </li>
                 </ul>
 
                 <!-- Add new workroom -->
-                <a href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Add... </a>
+                <a ng-href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Add... </a>
+                <br>
+
+                <!-- Join existing workrooms -->
+                <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join... </a>
+
               </div>
             </div>
           </div>
@@ -91,7 +92,10 @@
       </div>
 
 
-<!-- Add workroom modal -->
+      <br><br><br><br><br><br><br><br><br>
+
+
+<!-- Create new workroom modal -->
 <div class="modal fade" id="AddWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="AddWorkroomModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -115,6 +119,46 @@
 </div>
 
 
+<!-- Join Workroom modal -->
+<div class="modal fade" id="JoinWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="JoinWorkroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="JoinWorkroomController" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="JoinWorkroomModalLabel">Browse Workrooms</h4>
+        </div>
+        <div class="modal-body">
+          <div class="pre-scrollable">
+            <div class="form-group">
+              Select the workrooms you'd like to join:
+            </div>
+            <div class="form-group">
+              Filter: <input type="text" ng-model="all_query" placeholder="Search..." size="8">
+            </div>
+            <ul class="list-unstyled">
+              <div class="form-group form-inline">
+                <li ng-repeat="workroom in all_workrooms | filter:all_query">
+                  <span class="col-md-9">
+                    #{{workroom.name}}
+                  </span>
+                  <span ng-if="workroom.member == 'yes'" class="col-md-3">
+                    <span class="glyphicon glyphicon-check"></span>
+                  </span>
+                  <span ng-if="workroom.member == 'no'">
+                    <a ng-click="JoinWorkroom(workroom._id);">Join</button>
+                  </span>
+                  <!--<a href="#/workrooms/{{workroom._id}}/join">Join</a>-->
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Invite user modal -->
 <div class="modal fade" id="InviteUserModal" tabindex="-1" role="dialog" aria-labelledby="InviteUserModalLabel" aria-hidden="true">
@@ -126,9 +170,17 @@
           <h4 class="modal-title" id="InviteUserModalLabel">Invite to workroom</h4>
         </div>
         <div class="modal-body">
+
+
           <div class="form-group">
-              <input type="text" class="form-control" ng-model="inviteUserName" placeholder="Type or select the names of team members that you would like to invite:" size="40">
+            <label for="inviteUsers">Type or select the names of team members that you would like to invite:</label>
+            <!--<input type="text" class="form-control" ng-model="inviteUsers" id="inviteUsers" size="60">-->
+            <select ui-select2 ng-model="inviteUsers" id="inviteUsers" style="width:300px" multiple>
+                <option ng-repeat="user in users" value="{{user._id}}">{{user.displayname}} ({{user.username}})</option>
+            </select>
           </div>
+
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -144,8 +196,20 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
 
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
   <script src="bower_components/angular/angular.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
+
+  <script type="text/javascript" src="bower_components/select2/select2.js"></script>
+  <script type="text/javascript" src="bower_components/angular-ui-select2/src/select2.js"></script>
+
+  <script src="bower_components/socket.io-client/dist/socket.io.js"></script>
+  <script src="bower_components/angular-socket-io/socket.js"></script>
+
   <script src="js/services.js"></script>
   <script src="bower_components/angular-resource/angular-resource.js"></script>
 
@@ -154,5 +218,10 @@
   <script src="js/controllers.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/directives.js"></script>
+
+  <script>
+    $(document).ready(function() { $("#inviteUsers").select2(); });
+  </script>
+
 </body>
 </html>
