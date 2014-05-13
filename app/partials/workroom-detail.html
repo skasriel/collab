@@ -1,15 +1,40 @@
 <br>
 <br>
 <br>
-<h2>#{{workroomName}}</h2>
 
-<a href="#/workrooms/{{workroomId}}/users">Users...</a>
-<ul">
-  <li ng-repeat="message in messages">
-    {{message.html}} ({{message.author_name}})
-  </li>
-</ul>
+<div class="row">
+  <div class="container">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span2">
+            <div class="col-md-4"><h2>#{{workroomName}}</h2></div>
+            <div class="col-md-2"><a href="#/workrooms/{{workroomId}}/users">Users...</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+
+<div class="row pre-scrollable">
+  <div class="container">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span2">
+            <div class="col-md-8">
+              <ul class="list-unstyled">
+                <li ng-repeat="message in messages">
+                  {{message.html}} ({{message.author_name}})
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <!-- text area to enter a new message -->
