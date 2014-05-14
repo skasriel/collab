@@ -1,6 +1,8 @@
 var application_root = __dirname,
     express = require("express"),
     path = require("path"),
+    morgan = require("morgan"),
+    cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy;
@@ -32,17 +34,20 @@ mongoose.connect('mongodb://localhost/workplace_database');
 
 // config
 console.log("configuring app");
-app.use(express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
-app.use(express.cookieParser('TEMP SECRET -- NOT FOR PROD'));
-app.use(express.bodyParser());
-app.use(express.session({ secret: 'keyboard cat' }));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(app.router);
+app.use(morgan('dev')) //express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
+  .use(cookieParser('TEMP SECRET -- NOT FOR PROD'))
+  .use(require('body-parser'))
+  .use(require('express-session', { secret: 'Told you, this aint prod' }));
 
-app.use(express.methodOverride());
-app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-app.use(express.static(path.join(application_root, "../")));
+app.use(passport.initialize())
+  .use(passport.session());
+
+console.log("configuring app 6");
+
+app.use(require('method-override'));
+app.use(require('errorhandler', { dumpExceptions: true, showStack: true }));
+app.use(require('serve-static', path.join(application_root, "../")));
+console.log("configuring app 7");
 
 
 
