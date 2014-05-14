@@ -148,7 +148,7 @@ addObj(message3);
 };
 
 // create a database
-//populateDB();
+populateDB();
 
 
 // launch server
