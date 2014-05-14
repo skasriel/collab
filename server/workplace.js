@@ -22,7 +22,10 @@ db.once('open', function() {
   // Create your schemas and models here.
   console.log("success");
 });
-mongoose.connect('mongodb://localhost/workplace_database');
+
+var mongoURL = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL || 'mongodb://localhost/workplace_database'
+mongoose.connect(mongoURL);
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
