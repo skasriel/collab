@@ -1,19 +1,30 @@
-<br>
-<br>
-<h1>Users in #{{workroomName}}:</h1>
-<ul class="list-unstyled">
-  <a href="#/workrooms/{{workroomId}}">Back to room</a>
-  <li ng-repeat="user in users">
-    {{user.username}}  ({{user.displayname}})
-  </li>
-</ul>
+<div class="pageheader">
+  <h2><i class="fa fa-home"></i> Users in #{{workroomName}} <span><a href="#/workrooms/{{workroomId}}">Back to messages</a></span></h2>
+</div>
+
+<div class="contentpanel">
+
+  <div class="col-sm-6 col-md-8">
+    <div class="panel panel-default panel-alt widget-messaging">
+      <div class="panel-body">
+
+        <ul class="list-unstyled">
+          <li ng-repeat="user in users">
+            {{user.username}}  ({{user.displayname}})
+          </li>
+        </ul>
 
 
-<!-- Invite user to this workroom (Modal is in main.html to make sure it's at the bottom of the html code, otherwise doesn't work)-->
-<a href="#/workrooms/{{workroomId}}/users" data-toggle="modal" data-target="#InviteUserModal"> + Invite... </a>
+        <!-- Invite user to this workroom (Modal is in main.html to make sure it's at the bottom of the html code, otherwise doesn't work)-->
+        <a href="#/workrooms/{{workroomId}}/users" data-toggle="modal" data-target="#InviteUserModal"> + Invite to #channel... </a>
+
+      </div><!-- panel-body -->
+    </div><!-- panel -->
+  </div><!-- col-sm-6 -->
 
 
 
+</div>
 
 
 <!--

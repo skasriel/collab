@@ -41,6 +41,7 @@ app.configure(function() {
   app.use(morgan('dev')); //express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
   app.use(express.static(path.join(application_root, "../bower_components/")));
   app.use(express.static(path.join(application_root, "../app/")));
+  app.use(express.static(path.join(application_root, "../app/template/")));
   app.use(express.static(path.join(application_root, "../")));
   app.use(express.cookieParser());
   app.use(express.bodyParser());

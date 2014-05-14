@@ -1,47 +1,714 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-
-<html lang="en" ng-app="workplaceApp" class="no-js"> <!--<![endif]-->
+<html lang="en" ng-app="workplaceApp" >
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Workplace App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/app.css">
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
-  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
-  <link rel="stylesheet" href="css/app.css"/>
-  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="images/favicon.png" type="image/png">
+
+  <title>Elance-oDesk Collaboration</title>
+
+  <link href="css/style.default.css" rel="stylesheet">
+  <link rel="stylesheet" href="/select2/select2.css">
+  <link rel="stylesheet" href="/html5-boilerplate/css/normalize.css">
+  <link rel="stylesheet" href="/html5-boilerplate/css/main.css">
+
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="js/html5shiv.js"></script>
+  <script src="js/respond.min.js"></script>
+  <![endif]-->
 </head>
 
-<body>
+<body ng-controller="WorkroomCtrl">
+
+<!-- Preloader -->
+<div id="preloader">
+    <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
+</div>
+
+<section>
+
+  <div class="leftpanel">
+
+    <div class="logopanel">
+        <h1><span>[</span> Elance-oDesk <span>]</span></h1>
+    </div><!-- logopanel -->
+
+    <div class="leftpanelinner">
+
+        <!-- This is only visible to small devices -->
+        <div class="visible-xs hidden-sm hidden-md hidden-lg">
+            <div class="media userlogged">
+                <img alt="" src="images/photos/loggeduser.png" class="media-object">
+                <div class="media-body">
+                    <h4>John Doe</h4>
+                    <span>"Life is so..."</span>
+                </div>
+            </div>
+
+            <h5 class="sidebartitle actitle">Account</h5>
+            <ul class="nav nav-pills nav-stacked nav-bracket mb30">
+              <li><a href="profile.html"><i class="fa fa-user"></i> <span>Profile</span></a></li>
+              <li><a href=""><i class="fa fa-cog"></i> <span>Account Settings</span></a></li>
+              <li><a href=""><i class="fa fa-question-circle"></i> <span>Help</span></a></li>
+              <li><a href="signout.html"><i class="fa fa-sign-out"></i> <span>Sign Out</span></a></li>
+            </ul>
+        </div>
+
+      <h5 class="sidebartitle">Channels</h5>
+      <input ng-model="query" placeholder="Search #channels...">
+      <ul class="nav nav-pills nav-stacked nav-bracket">
+
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query">
+          <a href="#/workrooms/{{workroom._id}}">
+            <i class="fa fa-th-list"></i>
+            <span>#{{workroom.name}} ({{workroom.messages.length}}) <!-- | {{Date(workroom.modified)}} --></span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Add new workroom -->
+      <a ng-href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Add... </a>
+      <br>
+
+      <!-- Join existing workrooms -->
+      <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join... </a>
 
 
 
-LOGIN!
+    </div><!-- leftpanelinner -->
+  </div><!-- leftpanel -->
+
+  <div class="mainpanel">
+
+    <div class="headerbar">
+
+      <a class="menutoggle"><i class="fa fa-bars"></i></a>
+
+      <form class="searchform" action="index.html" method="post">
+        <input type="text" class="form-control" name="keyword" placeholder="Search here..." />
+      </form>
+
+      <div class="header-right">
+        <ul class="headermenu">
+          <li>
+            <div class="btn-group">
+              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-user"></i>
+                <span class="badge">2</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-head pull-right">
+                <h5 class="title">2 Newly Registered Users</h5>
+                <ul class="dropdown-list user-list">
+                  <li class="new">
+                    <div class="thumb"><a href=""><img src="images/photos/user1.png" alt="" /></a></div>
+                    <div class="desc">
+                      <h5><a href="">Draniem Daamul (@draniem)</a> <span class="badge badge-success">new</span></h5>
+                    </div>
+                  </li>
+                  <li class="new">
+                    <div class="thumb"><a href=""><img src="images/photos/user2.png" alt="" /></a></div>
+                    <div class="desc">
+                      <h5><a href="">Zaham Sindilmaca (@zaham)</a> <span class="badge badge-success">new</span></h5>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="thumb"><a href=""><img src="images/photos/user3.png" alt="" /></a></div>
+                    <div class="desc">
+                      <h5><a href="">Weno Carasbong (@wenocar)</a></h5>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="thumb"><a href=""><img src="images/photos/user4.png" alt="" /></a></div>
+                    <div class="desc">
+                      <h5><a href="">Nusja Nawancali (@nusja)</a></h5>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="thumb"><a href=""><img src="images/photos/user5.png" alt="" /></a></div>
+                    <div class="desc">
+                      <h5><a href="">Lane Kitmari (@lane_kitmare)</a></h5>
+                    </div>
+                  </li>
+                  <li class="new"><a href="">See All Users</a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="btn-group">
+              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-envelope"></i>
+                <span class="badge">1</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-head pull-right">
+                <h5 class="title">You Have 1 New Message</h5>
+                <ul class="dropdown-list gen-list">
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user1.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Draniem Daamul <span class="badge badge-success">new</span></span>
+                      <span class="msg">Lorem ipsum dolor sit amet...</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user2.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Nusja Nawancali</span>
+                      <span class="msg">Lorem ipsum dolor sit amet...</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Weno Carasbong</span>
+                      <span class="msg">Lorem ipsum dolor sit amet...</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user4.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Zaham Sindilmaca</span>
+                      <span class="msg">Lorem ipsum dolor sit amet...</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user5.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Veno Leongal</span>
+                      <span class="msg">Lorem ipsum dolor sit amet...</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new"><a href="">Read All Messages</a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="btn-group">
+              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
+                <i class="glyphicon glyphicon-globe"></i>
+                <span class="badge">5</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-head pull-right">
+                <h5 class="title">You Have 5 New Notifications</h5>
+                <ul class="dropdown-list gen-list">
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user4.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Zaham Sindilmaca <span class="badge badge-success">new</span></span>
+                      <span class="msg">is now following you</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user5.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Weno Carasbong <span class="badge badge-success">new</span></span>
+                      <span class="msg">is now following you</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Veno Leongal <span class="badge badge-success">new</span></span>
+                      <span class="msg">likes your recent status</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Nusja Nawancali <span class="badge badge-success">new</span></span>
+                      <span class="msg">downloaded your work</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new">
+                    <a href="">
+                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
+                    <span class="desc">
+                      <span class="name">Nusja Nawancali <span class="badge badge-success">new</span></span>
+                      <span class="msg">send you 2 messages</span>
+                    </span>
+                    </a>
+                  </li>
+                  <li class="new"><a href="">See All Notifications</a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <img src="images/photos/loggeduser.png" alt="" />
+                {{active_user}}
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
+                <li><a href="profile.html"><i class="glyphicon glyphicon-user"></i> My Profile</a></li>
+                <li><a href="#"><i class="glyphicon glyphicon-cog"></i> Account Settings</a></li>
+                <li><a href="#"><i class="glyphicon glyphicon-question-sign"></i> Help</a></li>
+                <li><a href="/api/logout"><i class="glyphicon glyphicon-log-out"></i> Log Out</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <button id="chatview" class="btn btn-default tp-icon chat-icon">
+                <i class="glyphicon glyphicon-comment"></i>
+            </button>
+          </li>
+        </ul>
+      </div><!-- header-right -->
+
+    </div><!-- headerbar -->
 
 
+    <!-- angular loads partials here -->
+    <div ng-view></div>
 
-  <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-  <![endif]-->
 
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/angular-route/angular-route.js"></script>
-  <script src="js/services.js"></script>
-  <script src="bower_components/angular-resource/angular-resource.js"></script>
+  </div><!-- mainpanel -->
 
-  <script src="js/app.js"></script>
-  <script src="js/services.js"></script>
-  <script src="js/controllers.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/directives.js"></script>
+  <div class="rightpanel">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a href="#rp-alluser" data-toggle="tab"><i class="fa fa-users"></i></a></li>
+        <li><a href="#rp-favorites" data-toggle="tab"><i class="fa fa-heart"></i></a></li>
+        <li><a href="#rp-history" data-toggle="tab"><i class="fa fa-clock-o"></i></a></li>
+        <li><a href="#rp-settings" data-toggle="tab"><i class="fa fa-gear"></i></a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="rp-alluser">
+            <h5 class="sidebartitle">Online Users</h5>
+            <ul class="chatuserlist">
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/userprofile.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Eileen Sideways</strong>
+                            <small>Los Angeles, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user1.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <span class="pull-right badge badge-danger">2</span>
+                            <strong>Zaham Sindilmaca</strong>
+                            <small>San Francisco, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user2.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Nusja Nawancali</strong>
+                            <small>Bangkok, Thailand</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user3.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Renov Leongal</strong>
+                            <small>Cebu City, Philippines</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user4.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Weno Carasbong</strong>
+                            <small>Tokyo, Japan</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+            </ul>
+
+            <div class="mb30"></div>
+
+            <h5 class="sidebartitle">Offline Users</h5>
+            <ul class="chatuserlist">
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user5.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Eileen Sideways</strong>
+                            <small>Los Angeles, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user2.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Zaham Sindilmaca</strong>
+                            <small>San Francisco, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user3.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Nusja Nawancali</strong>
+                            <small>Bangkok, Thailand</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user4.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Renov Leongal</strong>
+                            <small>Cebu City, Philippines</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user5.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Weno Carasbong</strong>
+                            <small>Tokyo, Japan</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user4.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Renov Leongal</strong>
+                            <small>Cebu City, Philippines</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user5.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Weno Carasbong</strong>
+                            <small>Tokyo, Japan</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+            </ul>
+        </div>
+        <div class="tab-pane" id="rp-favorites">
+            <h5 class="sidebartitle">Favorites</h5>
+            <ul class="chatuserlist">
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user2.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Eileen Sideways</strong>
+                            <small>Los Angeles, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user1.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Zaham Sindilmaca</strong>
+                            <small>San Francisco, CA</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user3.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Nusja Nawancali</strong>
+                            <small>Bangkok, Thailand</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user4.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Renov Leongal</strong>
+                            <small>Cebu City, Philippines</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user5.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Weno Carasbong</strong>
+                            <small>Tokyo, Japan</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+            </ul>
+        </div>
+        <div class="tab-pane" id="rp-history">
+            <h5 class="sidebartitle">History</h5>
+            <ul class="chatuserlist">
+                <li class="online">
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user4.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Eileen Sideways</strong>
+                            <small>Hi hello, ctc?... would you mind if I go to your...</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user2.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Zaham Sindilmaca</strong>
+                            <small>This is to inform you that your product that we...</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+                <li>
+                    <div class="media">
+                        <a href="#" class="pull-left media-thumb">
+                            <img alt="" src="images/photos/user3.png" class="media-object">
+                        </a>
+                        <div class="media-body">
+                            <strong>Nusja Nawancali</strong>
+                            <small>Are you willing to have a long term relat...</small>
+                        </div>
+                    </div><!-- media -->
+                </li>
+            </ul>
+        </div>
+        <div class="tab-pane pane-settings" id="rp-settings">
+
+            <h5 class="sidebartitle mb20">Settings</h5>
+            <div class="form-group">
+                <label class="col-xs-8 control-label">Show Offline Users</label>
+                <div class="col-xs-4 control-label">
+                    <div class="toggle toggle-success"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-8 control-label">Enable History</label>
+                <div class="col-xs-4 control-label">
+                    <div class="toggle toggle-success"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-8 control-label">Show Full Name</label>
+                <div class="col-xs-4 control-label">
+                    <div class="toggle-chat1 toggle-success"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-xs-8 control-label">Show Location</label>
+                <div class="col-xs-4 control-label">
+                    <div class="toggle toggle-success"></div>
+                </div>
+            </div>
+
+        </div><!-- tab-pane -->
+
+    </div><!-- tab-content -->
+  </div><!-- rightpanel -->
+
+</section>
+
+<!-- Create new workroom modal -->
+<div class="modal fade" id="AddWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="AddWorkroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="AddWorkroomController" class="form-inline" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="AddWorkroomModalLabel">Create new #channel</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+              <input type="text" class="form-control" ng-model="workroomName" placeholder="Workroom name" size="40">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click='CreateWorkroom();'>Create workroom</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Join Workroom modal -->
+<div class="modal fade" id="JoinWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="JoinWorkroomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="JoinWorkroomController" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="JoinWorkroomModalLabel">Browse Workrooms</h4>
+        </div>
+        <div class="modal-body">
+          <div class="pre-scrollable">
+            <div class="form-group">
+              Select the #channels you'd like to join:
+            </div>
+            <div class="form-group">
+              Filter: <input type="text" ng-model="all_query" placeholder="Search..." size="8">
+            </div>
+            <ul class="list-unstyled">
+              <div class="form-group form-inline">
+                <li ng-repeat="workroom in all_workrooms | filter:all_query">
+                  <span class="col-md-9">
+                    #{{workroom.name}}
+                  </span>
+                  <span ng-if="workroom.member == 'yes'" class="col-md-3">
+                    <span class="glyphicon glyphicon-check"></span>
+                  </span>
+                  <span ng-if="workroom.member == 'no'">
+                    <a ng-click="JoinWorkroom(workroom._id);">Join</button>
+                  </span>
+                  <!--<a href="#/workrooms/{{workroom._id}}/join">Join</a>-->
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Invite user modal -->
+<div class="modal fade" id="InviteUserModal" tabindex="-1" role="dialog" aria-labelledby="InviteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="InviteUserController" class="form-inline" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="InviteUserModalLabel">Invite to #channel</h4>
+        </div>
+        <div class="modal-body">
+
+
+          <div class="form-group">
+            <label for="inviteUsers">Type or select the names of team members that you would like to invite:</label>
+            <!--<input type="text" class="form-control" ng-model="inviteUsers" id="inviteUsers" size="60">-->
+            <select ui-select2 ng-model="inviteUsers" id="inviteUsers" style="width:300px" multiple>
+                <option ng-repeat="user in users" value="{{user._id}}">{{user.displayname}} ({{user.username}})</option>
+            </select>
+          </div>
+
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click='InviteUser();'>Invite user</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="js/jquery-migrate-1.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/jquery.sparkline.min.js"></script>
+<script src="js/toggles.min.js"></script>
+<script src="js/retina.min.js"></script>
+<script src="js/jquery.cookies.js"></script>
+
+<script src="js/custom.js"></script>
+
+
+<script src="/angular/angular.js"></script>
+<script src="/angular-route/angular-route.js"></script>
+
+<script src="/select2/select2.js"></script>
+<script src="/angular-ui-select2/src/select2.js"></script>
+
+<script src="/bower_components/socket.io-client/dist/socket.io.js"></script>
+<script src="/angular-socket-io/socket.js"></script>
+
+<script src="js/services.js"></script>
+<script src="/angular-resource/angular-resource.js"></script>
+
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+
+<script>
+  $(document).ready(function() { $("#inviteUsers").select2(); });
+</script>
+
+
 </body>
 </html>

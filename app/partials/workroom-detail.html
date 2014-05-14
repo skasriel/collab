@@ -1,62 +1,44 @@
-<br>
-<br>
-<br>
-
-<div class="row">
-  <div class="container">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span2">
-            <div class="col-md-4"><h2>#{{workroomName}}</h2></div>
-            <div class="col-md-2"><a href="#/workrooms/{{workroomId}}/users">Users...</a></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="pageheader">
+  <h2><i class="fa fa-home"></i> #{{workroomName}} <span>Messages<a href="#/workrooms/{{workroomId}}/users"> | Users...</a></span></h2>
 </div>
 
+<div class="contentpanel">
 
-<div class="row pre-scrollable">
-  <div class="container">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span2">
-            <div class="col-md-8">
-              <ul class="list-unstyled">
-                <li ng-repeat="message in messages">
-                  <b>{{message.author_name}}</b> {{message.date}}<br>
-                  {{message.html}}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="col-sm-6 col-md-8">
+    <div class="panel panel-default panel-alt widget-messaging">
+      <div class="panel-body">
+        <ul class="list-unstyled">
+          <li ng-repeat="message in messages">
+            <small class="pull-right">Dec 10 {{message.date}}</small>
+            <h4 class="sender">{{message.author_name}}</h4>
+            <small>{{message.html}}</small>
+          </li>
+        </ul>
+      </div><!-- panel-body -->
+    </div><!-- panel -->
+  </div><!-- col-sm-6 -->
+
+
 </div>
+
 
 
 <!-- text area to enter a new message -->
 <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
   <div class="row">
     <div class="container">
-      <div class="col-md-3"></div>
-      <div class="col-md-8">
-        <div class="container">
-          <form ng-controller="AddMessageController" class="form-inline" role="form">
-            <div class="form-group">
-                  <input type="textarea" class="form-control" ng-model="message" placeholder="Type your message here..." size="40">
-            </div>
-            <button type="button" class="btn btn-primary" ng-click='PostMessage();'>Send</button>
-          </form>
-        </div>
-      </nav>
+      <div class="col-md-2"></div>
+      <div class="col-md-10">
+        <form ng-controller="AddMessageController" class="form-inline" role="form">
+          <div class="form-group">
+                <input type="textarea" class="form-control" ng-model="message" placeholder="Type your message here..." size="60">
+          </div>
+          <button type="button" class="btn btn-primary" ng-click='PostMessage();'>Send</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-
+</nav>
 
 <!--
 

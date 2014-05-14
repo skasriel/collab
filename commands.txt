@@ -1,0 +1,14 @@
+# start mongo
+
+# connect to mongo terminal
+
+# github
+git clone https://github.com/skasriel/collab.git
+git push origin master
+
+# heroku
+git commit -a -m
+git push heroku master
+heroku ps:scale web=1
+heroku open
+heroku logs --source app
