@@ -5,6 +5,16 @@
   "description": "A starter project for AngularJS",
   "repository": "https://github.com/angular/angular-seed",
   "license": "MIT",
+
+
+  "dependencies": {
+    "passport": "*",
+    "passport-oauth": "*",
+    "passport-github": "*",
+    "passport-odesk": "*",
+    "socket.io": ">= 0.9.6"
+  },
+
   "devDependencies": {
     "karma": "~0.10",
     "protractor": "~0.20.1",

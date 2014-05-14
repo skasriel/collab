@@ -4,96 +4,78 @@ body {
   padding-top: 20px;
 }
 
-
-.phone-images {
-  background-color: white;
-  width: 450px;
-  height: 450px;
-  overflow: hidden;
-  position: relative;
-  float: left;
+.bs-sidebar .nav > .active > ul {
+    display: block;
+    margin-bottom: 8px;
+    background-color: #666666;
 }
 
-.phones {
-  list-style: none;
+/*
+.bs-sidebar {
+  background-color: #666666;
+  text-color: #dddddd;
+}
+*/
+
+
+
+/* Auth css */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none;
 }
 
-.thumb {
-  float: left;
-  margin: -0.5em 1em 1.5em 0;
-  padding-bottom: 1em;
-  height: 100px;
-  width: 100px;
+body {
+    font-size: 1em;
 }
 
-.phones li {
-  clear: both;
-  height: 115px;
-  padding-top: 15px;
+#cover {
+    position:absolute;
+    height:100%;
+    width:100%;
+    background:white;
 }
 
-/** Detail View **/
-img.phone {
-  float: left;
-  margin-right: 3em;
-  margin-bottom: 2em;
-  background-color: white;
-  padding: 2em;
-  height: 400px;
-  width: 400px;
-  display: none;
+#userInfo {
+    float:right;padding:8px;
 }
 
-img.phone:first-child {
-  display: block;
+#alertBox {
+    position: fixed;
+    min-width: 75%;
+    left: 50%;
+    margin: 0 0 0 -37.5%;
+    top: 5px;
 }
 
-
-ul.phone-thumbs {
-  margin: 0;
-  list-style: none;
+.fa.fa-twitter {
+    color:#00A7E7;
 }
 
-ul.phone-thumbs li {
-  border: 1px solid black;
-  display: inline-block;
-  margin: 1em;
-  background-color: white;
+.fa.fa-facebook-square {
+    color:#3662A0;
 }
 
-ul.phone-thumbs img {
-  height: 100px;
-  width: 100px;
-  padding: 1em;
+.fa.fa-google-plus-square {
+    color: #D74634;
 }
 
-ul.phone-thumbs img:hover {
-  cursor: pointer;
+.fade-hide-setup, .fade-show-setup {
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 }
 
-
-ul.specs {
-  clear: both;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.fade-hide-setup {
+    opacity:1;
+}
+.fade-hide-setup.fade-hide-start {
+    opacity:0;
 }
 
-ul.specs > li{
-  display: inline-block;
-  width: 200px;
-  vertical-align: top;
+.fade-show-setup {
+    opacity:0;
 }
-
-ul.specs > li > span{
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-ul.specs dt {
-  font-weight: bold;
-}
-
-h1 {
-  border-bottom: 1px solid gray;
+.fade-show-setup.fade-show-start {
+    opacity:1;
 }

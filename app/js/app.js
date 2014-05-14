@@ -2,9 +2,9 @@
 
 
 // Angular Workplace module
-var workplaceApp = angular.module('workplaceApp', ['ngRoute', 'workplaceControllers', 'workroomServices'])
-  .config(['$routeProvider',
-  function($routeProvider) {
+var workplaceApp = angular.module('workplaceApp', ['ngRoute', 'workplaceControllers', 'workroomServices', 'socketio.services',  'btford.socket-io', 'ui.select2'])
+  .config(['$routeProvider', '$locationProvider',
+  function($routeProvider, $locationProvider) {
     $routeProvider.
     when('/workrooms', {
         templateUrl: 'partials/workroom-list.html',
@@ -21,4 +21,5 @@ var workplaceApp = angular.module('workplaceApp', ['ngRoute', 'workplaceControll
     otherwise({
       redirectTo: '/workrooms'
     });
+    //$locationProvider.html5Mode(true);
   }]);

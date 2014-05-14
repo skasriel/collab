@@ -4,7 +4,7 @@ var passport = require('passport'),
     Message = require('./models/message');
 
 var HOME = '/app/main.html'
-module.exports = function (app) {
+module.exports = function (app, io) {
   function IsAuthenticated(req,res,next) {
     if(req.isAuthenticated()){
         next();
@@ -14,7 +14,8 @@ module.exports = function (app) {
     }
   }
 
-  // User registration & login
+
+  // User registration
   app.post('/api/register', function(req, res) {
       var user = new User({
           username : req.body.username,
@@ -39,17 +40,32 @@ module.exports = function (app) {
       });
   });
 
-
+  // login
   app.post('/api/login', passport.authenticate('local'), function(req, res) {
       console.log("logging in");
       res.redirect(HOME);
   });
 
-
   app.get('/api/logout', function(req, res) {
       req.logout();
       res.redirect('/app/register.html');
   });
+
+
+  app.get('/auth/odesk', passport.authenticate('odesk'));
+
+  app.get('/auth/odesk/callback', passport.authenticate('odesk', { failureRedirect: '/auth' }), function (req, res) {
+    req.session.odesk = req.user
+    res.redirect('/auth')
+  });
+
+  app.get('/auth', function (req, res) {
+		console.log("/auth: "+res.locals.user);
+		if (res.locals.user.odeskuserid) {
+			res.redirect('/issues');
+			return;
+		} else res.render ('auth.html', {})
+	});
 
 
   // test api
@@ -63,15 +79,29 @@ module.exports = function (app) {
     return res.send(req.user.username);
   });
 
-  // List workrooms
-  app.get('/api/workrooms', IsAuthenticated, function (req, res) {
-    console.log("GET /api/workrooms. User is: "+req.user.username);
+  // returns the list of all users
+  app.get('/api/users', IsAuthenticated, function (req, res) {
+    console.log("GET /api/users");
+    return User
+      .find()
+      .select('username displayname _id')
+      .sort("displayname")
+      .exec(function (err, users) {
+        if (err) return console.log(err);
+        console.log("GET /api/users returns: "+users);
+        return res.send(users);
+      });
+  });
+
+  // List workrooms this user has joined
+  app.get('/api/my-workrooms', IsAuthenticated, function (req, res) {
+    console.log("GET /api/my-workrooms. User is: "+req.user.username);
     return Workroom
-      .find() //TODO: show this user's workrooms only //{req.user: { $in: workroom.users} })
-      .sort("name")
+      .find()
+      .sort("name _id")
       .exec(function (err, workrooms) {
         if (err) return console.log(err);
-        // inefficient, but works for now: return the subset of rooms that this user has access to
+        // inefficient, but works for now: return the subset of rooms that this user has joined
         var allowed = new Array();
         console.log("Checking access to: "+workrooms.length+" workrooms");
         for(i=0; i<workrooms.length; i++) {
@@ -81,9 +111,9 @@ module.exports = function (app) {
           for (j=0; j<roomUsers.length; j++) {
             var roomUser = roomUsers[j];
             if (req.user._id.equals(roomUser)) {
-              console.log("user match: "+roomUser);
+              console.log("user match: "+roomUser+" is member of room: "+room.name);
               allowed.push(room);
-              continue;
+              break;
             }
           }
         }
@@ -92,8 +122,40 @@ module.exports = function (app) {
       });
   });
 
+  // List all available workrooms to this user (including the ones she hasn't joined)
+  app.get('/api/all-workrooms', IsAuthenticated, function (req, res) {
+    console.log("GET /api/all-workrooms. User is: "+req.user.username);
+    return Workroom
+      .find()
+      .sort("name")
+      .exec(function (err, workrooms) {
+        if (err) return console.log(err);
+        var roomList = new Array();
+        for(i=0; i<workrooms.length; i++) {
+          var room = workrooms[i];
+          var roomUsers = room.users;
+          if (!roomUsers) continue;
+          var isMember = false;
+          for (j=0; j<roomUsers.length; j++) {
+            var roomUser = roomUsers[j];
+            if (req.user._id.equals(roomUser)) {
+              isMember = true;
+              break;
+            }
+          }
+          console.log(roomUser+" membership to "+room.name+" is "+isMember);
+          var roomObj = {"name": room.name, "_id": room._id, "member": (isMember?"yes":"no")};
+          roomList.push(roomObj);
+        }
+        console.log("all-workrooms returns: "+roomList);
+        return res.send(roomList);
+      });
+  });
+
+
   // Add a new workroom
-  app.post('/api/workrooms', IsAuthenticated, function (req, res) {
+  PostToWorkroom = function(io) {
+    return function (req, res) {
     console.log("POST /api/workrooms. User is: "+req.user);
     console.log(req.body);
 
@@ -113,7 +175,10 @@ module.exports = function (app) {
       });
       return res.send(workroom);
     });
-  });
+  }
+  };
+  app.post('/api/workrooms', IsAuthenticated, PostToWorkroom(io));
+
 
 
   var additionalParams = function() {
@@ -164,6 +229,15 @@ module.exports = function (app) {
       workroom.messages.push(message);
       message.save();
       workroom.save();
+
+      // notify websockets so all logged in users refresh their messages
+      // TODO: note that this isn't secure at all: should only send contents to users who are part of this room
+      io.sockets.emit('send:message', {
+        user: message.author_name,
+        room: req.params.id,
+        message: message.html
+      });
+
       console.log("Posted: "+message);
       return res.send(message);
     });
@@ -203,103 +277,39 @@ module.exports = function (app) {
     return room;
   });
 
-  // Invite a user to a room
-  app.post('/api/workrooms/:id/users', IsAuthenticated, function (req, res) {
-    var inviteUserName = req.body.inviteUserName;
-    console.log("POST /api/workrooms/:id/users "+req.params.id+" "+inviteUserName);
-    var room = Workroom.findById(req.params.id, function (err, workroom) {
-      if (err) return console.log(err);
-      var inviteUser = User.find('username': {$in: inviteUserName}, function(err, inviteUser) {
-        if (err) return console.log(err);
-        var users = room.users;
-        if (users.contains(inviteUser._id)) {
-          console.log("user "+inviteUser+" is already in workroom "+room.name);
-          return res.send(room);
-        }
-        users.push(inviteUser._id);
-        workroom.save();
-        console.log("Users in workroom: "+room.name+" are now: "+room.users.length+" "+room.users);
-        return res.send(room);
-      }
-    });
-  });
 
-  // PUT to UPDATE
-
-  // Bulk update
-  /*app.put('/api/products', function (req, res) {
-      var i, len = 0;
-      console.log("is Array req.body.products");
-      console.log(Array.isArray(req.body.products));
-      console.log("PUT: (products)");
-      console.log(req.body.products);
-      if (Array.isArray(req.body.products)) {
-          len = req.body.products.length;
-      }
-      for (i = 0; i < len; i++) {
-          console.log("UPDATE product by id:");
-          for (var id in req.body.products[i]) {
-              console.log(id);
+  function arrayUnique(array) {
+      var a = array.concat();
+      for(var i=0; i<a.length; ++i) {
+          for(var j=i+1; j<a.length; ++j) {
+              if(a[i] === a[j])
+                  a.splice(j--, 1);
           }
-          ProductModel.update({ "_id": id }, req.body.products[i][id], function (err, numAffected) {
-              if (err) {
-                  console.log("Error on update");
-                  console.log(err);
-              } else {
-                  console.log("updated num: " + numAffected);
-              }
-          });
       }
-      return res.send(req.body.products);
-  });
 
-  // Single update
-  app.put('/api/products/:id', function (req, res) {
-    return ProductModel.findById(req.params.id, function (err, product) {
-      product.title = req.body.title;
-      product.description = req.body.description;
-      product.style = req.body.style;
-      product.images = req.body.images;
-      product.categories = req.body.categories;
-      product.catalogs = req.body.catalogs;
-      product.variants = req.body.variants;
-      return product.save(function (err) {
-        if (!err) {
-          console.log("updated");
-        } else {
-          console.log(err);
-        }
-        return res.send(product);
-      });
+      return a;
+  };
+
+  // Invite one ore more users to a room
+  app.post('/api/workrooms/:id/users', IsAuthenticated, function (req, res) {
+    var inviteUserIDs = req.body.inviteUserIDs; // comma separated list of user IDs to invite
+    if (inviteUserIDs==null || inviteUserIDs=='' || inviteUserIDs.length==0) {
+      // this is really a user asking to join, same as inviting herself... (hack...)
+      inviteUserIDs = [req.user._id];
+      console.log("request to join "+req.params.id+" by user "+req.user);
+    }
+    console.log("POST /api/workrooms/:id/users "+req.params.id+" "+inviteUserIDs);
+    console.log("info params = "+inviteUserIDs.length+" "+(typeof inviteUserIDs === 'string')+ " "+(typeof inviteUserIDs === 'array'));
+
+    var room = Workroom.findById(req.params.id, function (err, room) {
+      if (err) return console.log(err);
+      console.log("found room: "+room.name+" users="+room.users);
+      inviteUserList = inviteUserIDs // inviteUserIDs.split(',');
+      console.log("adding to list of users: "+inviteUserList);
+      room.users = arrayUnique(room.users.concat(inviteUserList));
+      room.save();
+      console.log("Users in workroom: "+room.name+" are now: "+room.users.length+" "+room.users);
+      return res.send(room);
     });
   });
-  */
-
-
-  /*// Bulk destroy all products
-  app.delete('/api/products', function (req, res) {
-    ProductModel.remove(function (err) {
-      if (!err) {
-        console.log("removed");
-        return res.send('');
-      } else {
-        console.log(err);
-      }
-    });
-  });
-
-  // remove a single product
-  app.delete('/api/products/:id', function (req, res) {
-    return ProductModel.findById(req.params.id, function (err, product) {
-      return product.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
-      });
-    });
-  });
-  */
 };
