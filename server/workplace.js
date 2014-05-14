@@ -1,5 +1,4 @@
-var application_root = __dirname,
-    express = require("express"),
+var express = require("express"),
     path = require("path"),
     morgan = require("morgan"),
     cookieParser = require('cookie-parser'),
@@ -7,6 +6,9 @@ var application_root = __dirname,
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy;
     //oDeskStrategy = require('passport-odesk').Strategy;
+
+var application_root = __dirname,
+    static_root = path.join(application_root, "../");
 
 /*var _ = require('gl519');
 
@@ -20,7 +22,6 @@ defaultEnv("ODESK_API_KEY", "0ef06ff8bccf675f09f4e80f17d62635"); //26739894934be
 defaultEnv("ODESK_API_SECRET", "73ba5b50a1ddf2e1"); //b694a28f79d55f7b
 */
 
-var app = express();
 
 // database
 
@@ -33,21 +34,21 @@ db.once('open', function() {
 mongoose.connect('mongodb://localhost/workplace_database');
 
 // config
-console.log("configuring app");
+var app = express();
+
+console.log("configuring app "+static_root);
 app.use(morgan('dev')) //express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
-  .use(cookieParser('TEMP SECRET -- NOT FOR PROD'))
-  .use(require('body-parser'))
-  .use(require('express-session', { secret: 'Told you, this aint prod' }));
+app.use(express.static(static_root));
+//app.use(require('serve-static', __dirname + '/../', {'index': ['/app/register.html', '/app/index.html']})) // __dirname + '/../')); //path.join(application_root, "../")));
+app.use(cookieParser('TEMP SECRET -- NOT FOR PROD'))
+app.use(require('body-parser'))
+app.use(require('express-session', { secret: 'Told you, this aint prod' }));
 
 app.use(passport.initialize())
-  .use(passport.session());
-
-console.log("configuring app 6");
+app.use(passport.session());
 
 app.use(require('method-override'));
-app.use(require('errorhandler', { dumpExceptions: true, showStack: true }));
-app.use(require('serve-static', path.join(application_root, "../")));
-console.log("configuring app 7");
+app.use(require('errorhandler', { dumpExceptions: true, showStack: true })); // makes the browser hang for some reason
 
 
 
@@ -114,6 +115,7 @@ var User = require('./models/user');
 	}); // end app.use
 
 */
+
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
@@ -202,15 +204,6 @@ addObj(message3);
 // create a database
 //populateDB();
 
-
-
-// emitter to connect socket.io to routers
-/*var EventEmitter = require('events').EventEmitter;
-var emitter = new EventEmitter();
-app.use(function(req, res, next) {
-  req.emitter = emitter;
-  next();
-});*/
 
 // launch server
 var server = require('http').createServer(app);

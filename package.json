@@ -6,7 +6,7 @@
   "repository": "https://github.com/skasriel/collab",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.2.0",
+    "express": "3.5.3",
     "passport": "*",
     "passport-local": "^1.0.0",
     "passport-oauth": "*",
@@ -18,7 +18,6 @@
     "cookie-session": "^1.0.2",
     "express-session": "^1.1.0",
     "serve-favicon": "^2.0.0",
-    "path": "^0.4.9",
     "logger": "0.0.1",
     "cookie-parser": "^1.1.0",
     "session": "^0.1.0",
@@ -38,12 +37,7 @@
   },
 
   "scripts": {
-<<<<<<< HEAD
-    "postinstall": "bower install app",
-
-=======
     "postinstall": "bower install",
->>>>>>> 1d10c65031743fa4f3c2a4d48851acd2843e76ae
     "prestart": "npm install",
     "start": "http-server -a localhost -p 8000",
     "pretest": "npm install",

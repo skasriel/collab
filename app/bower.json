@@ -1,22 +1,23 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
-  "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
+  "name": "collab",
+  "description": "My little collab project",
+  "version": "0.1.0",
+  "homepage": "https://github.com/skasriel/collab",
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "angular": "1.2.x",
-    "angular-route": "1.2.x",
+    "angular": "~1.2.14",
+    "angular-route": "~1.2.14",
     "angular-loader": "1.2.x",
     "angular-mocks": "~1.2.x",
     "html5-boilerplate": "~4.3.0",
-
-    "angular": "~1.2.14",
-    "angular-socket-io": "~0.3.0",
-    "angular-route": "~1.2.14",
-
+    "angular-socket-io": "~0.6.0",
     "select2": "~3.4.8",
     "angular-ui-select2": "~0.0.5",
+    "bootstrap": "~3.1.1",
+    "jquery": "~2.1.1",
+    "modernizr": "~2.8.1",
+    "socket.io-client": "~0.9.16",
+    "angular-resource": "~1.2.16"
   }
 }
