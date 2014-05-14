@@ -37,7 +37,7 @@
   },
 
   "scripts": {
-    "postinstall": "bower install",
+    "postinstall": "cd app; bower install",
     "prestart": "npm install",
     "start": "http-server -a localhost -p 8000",
     "pretest": "npm install",
