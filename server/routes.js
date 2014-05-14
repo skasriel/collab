@@ -3,7 +3,7 @@ var passport = require('passport'),
     Workroom = require('./models/workroom'),
     Message = require('./models/message');
 
-var HOME = '/app/main.html'
+var HOME = '/main.html'
 module.exports = function (app, io) {
   function IsAuthenticated(req,res,next) {
     if(req.isAuthenticated()){
@@ -30,7 +30,7 @@ module.exports = function (app, io) {
       //          User.register(user, req.body.password, function(err, account) {
           console.log("error? registering user: "+err+" user: "+account);
           if (err) {
-              return res.redirect('/app/register.html');
+              return res.redirect('/register.html');
           }
 
           req.login(user, function(err) {
@@ -47,7 +47,7 @@ module.exports = function (app, io) {
 
   app.get('/api/logout', function(req, res) {
       req.logout();
-      res.redirect('/app/register.html');
+      res.redirect('/register.html');
   });
 
 

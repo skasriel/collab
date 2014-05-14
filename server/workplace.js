@@ -36,7 +36,9 @@ var app = express();
 app.configure(function() {
   console.log("configuring app "+static_root);
   app.use(morgan('dev')); //express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
-  app.use(express.static(static_root));
+  app.use(express.static(path.join(application_root, "../bower_components/")));
+  app.use(express.static(path.join(application_root, "../app/")));
+  app.use(express.static(path.join(application_root, "../")));
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.session({ secret: 'keyboard cat' }));
