@@ -148,19 +148,21 @@ addObj(message3);
 };
 
 // create a database
-populateDB();
+//populateDB();
 
 
 // launch server
 // server & socket.io
 var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
-io.sockets.on('connection', require('./routes/socket'));
+//var io = require('socket.io').listen(server);
+//io.sockets.on('connection', require('./routes/socket'));
 
 // Setup routes
-var routes = require('./routes');
-routes(app, io);
+//var routes = require('./routes');
+//routes(app, io);
 
 
-
-server.listen(3000);
+var port = Number(process.env.PORT || 3000);
+server.listen(port, function() {
+  console.log("Listening on " + port);
+});
