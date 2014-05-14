@@ -40,7 +40,6 @@ module.exports = function (app, io) {
       });
   });
 
-  // login
   app.post('/api/login', passport.authenticate('local'), function(req, res) {
       console.log("logging in");
       res.redirect(HOME);
