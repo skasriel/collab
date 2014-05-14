@@ -23,8 +23,8 @@ db.once('open', function() {
   console.log("success");
 });
 
-var mongoURL = process.env.MONGOLAB_URI ||
-  process.env.MONGOHQ_URL || 'mongodb://localhost/workplace_database'
+var mongoURL = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/workplace_database';
+console.log("Connecting to MongoDB on "+mongoURL);
 mongoose.connect(mongoURL);
 
 passport.use(new LocalStrategy(User.authenticate()));
