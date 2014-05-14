@@ -31,10 +31,10 @@ passport.deserializeUser(User.deserializeUser());
 // config
 var app = express();
 
-console.log("configuring app "+static_root);
 
 
 app.configure(function() {
+  console.log("configuring app "+static_root);
   app.use(morgan('dev')); //express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
   app.use(express.static(static_root));
   app.use(express.cookieParser());
