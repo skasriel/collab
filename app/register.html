@@ -1,120 +1,135 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-
-<html lang="en" ng-app="workplaceApp" class="no-js"> <!--<![endif]-->
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Workplace App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/app.css">
-  <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="/html5-boilerplate/css/normalize.css">
-  <link rel="stylesheet" href="/html5-boilerplate/css/main.css">
-  <script src="/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="images/favicon.png" type="image/png">
+
+  <title>Elance-oDesk Collab > Register</title>
+
+  <link href="css/style.default.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="js/html5shiv.js"></script>
+  <script src="js/respond.min.js"></script>
+  <![endif]-->
 </head>
 
-<body>
+<body class="signin">
 
+<!-- Preloader -->
+<div id="preloader">
+    <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
+</div>
 
-  <div class="row">
-    <div class="container">
-      <div class="col-md-8">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <div class="span2">
-              <br><br><br>
-              <h2>Have an account?</h2>
-              <a href="#" class="btn btn-success" data-toggle="modal" data-target="#LoginModal">Login</a>
+<section>
+
+    <div class="signuppanel">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="signup-info">
+                    <div class="logopanel">
+                        <h1><span>[</span> Elance-oDesk <span>]</span></h1>
+                    </div><!-- logopanel -->
+
+                    <div class="mb20"></div>
+
+                      <h5><strong>Welcome to Elance-oDesk Collab</strong></h5>
+                      <ul>
+                          <li><i class="fa fa-arrow-circle-o-right mr5"></i> Completely a side project </li>
+                          <li><i class="fa fa-arrow-circle-o-right mr5"></i> Not meant to scale or be secure </li>
+                          <li><i class="fa fa-arrow-circle-o-right mr5"></i> Client side built on Bootstrap, Angular.js, Socket.io</li>
+                          <li><i class="fa fa-arrow-circle-o-right mr5"></i> Server side built on NodeJS, MongoDB</li>
+                          <li><i class="fa fa-arrow-circle-o-right mr5"></i> and much more...</li>
+                      </ul>
+                      <div class="mb20"></div>
+
+                </div><!-- signup-info -->
+
+            </div><!-- col-sm-6 -->
+
+            <div class="col-md-6">
+
+                <form method="post" action="/api/register">
+
+                    <h3 class="nomargin">Sign Up</h3>
+                    <p class="mt5 mb20">Already a member? <a href="/login.html"><strong>Log In</strong></a>
+                      or <a class="oBtn oBtnPrimary oBtnLarge" href="/auth/odesk">Link your oDesk account</a>
+                    </p>
+
+                    <label class="control-label">Name</label>
+                    <div class="row mb10">
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="firstname"  placeholder="First name" />
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="lastname" placeholder="Last name" />
+                        </div>
+                    </div>
+
+                    <div class="mb10">
+                        <label class="control-label">Email address</label>
+                        <input type="text" class="form-control" name="username" placeholder="Email address" />
+                    </div>
+
+                    <div class="mb10">
+                        <label class="control-label">Password</label>
+                        <input type="password" class="form-control" name="password" placeholder="Password"/>
+                    </div>
+
+                    <br />
+
+                    <button class="btn btn-success btn-block">Sign Up</button>
+                </form>
+            </div><!-- col-sm-6 -->
+
+        </div><!-- row -->
+
+        <div class="signup-footer">
+            <div class="pull-left">
+                &copy; 2014. All Rights Reserved. Bracket Bootstrap 3 Admin Template
             </div>
-          </div>
+            <div class="pull-right">
+                Created By: <a href="http://themepixels.com/" target="_blank">ThemePixels</a>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
+
+    </div><!-- signuppanel -->
 
 
-<a class="oBtn oBtnPrimary oBtnLarge" href="/auth/odesk">Link your oDesk account</a>
-
-  <div class="row">
-    <div class="container">
-      <div class="col-md-8">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <div class="span2">
-              <br><br><br>
-              <h1>Elance-oDesk: Register</h1>
-              <form class="form-inline" role="form" action="/api/register" method="post">
-                <div class="form-group">
-                  <input type="text" class="form-control" name="firstname" placeholder="First name" size="20">
-                  <input type="text" class="form-control" name="lastname" placeholder="Last name" size="20">
-                </div>
-                <div class="form-group">
-                  <input type="text" class="form-control" name="username" placeholder="User name" size="20">
-                </div>
-                <div class="form-group">
-                  <input type="password" class="form-control" name="password" placeholder="password" size="20">
-                </div>
-                <div class="form-group">
-                  <input type="submit" class="btn btn-success" value="Register"></input>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+</section>
 
 
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="js/jquery-migrate-1.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/jquery.sparkline.min.js"></script>
+<script src="js/jquery.cookies.js"></script>
+<script src="js/toggles.min.js"></script>
+<script src="js/retina.min.js"></script>
 
-  <!-- Login modal -->
-  <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="LoginModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form class="form-inline" role="form" action="/api/login" method="post">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="LoginModalLabel">Login</h4>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="text" class="form-control" name="username" placeholder="Email address" size="20">
-              <input type="password" class="form-control" name="password" placeholder="Password" size="20">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Login</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+<script src="js/chosen.jquery.min.js"></script>
 
+<script src="js/custom.js"></script>
+<script>
+    jQuery(document).ready(function(){
 
-<!--[if lt IE 7]>
-    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-<![endif]-->
+        // Chosen Select
+        jQuery(".chosen-select").chosen({
+            'width':'100%',
+            'white-space':'nowrap',
+            disable_search: true
+        });
 
-<script src="/angular/angular.js"></script>
-<script src="/angular-route/angular-route.js"></script>
+    });
+</script>
 
-<script src="/bower_components/socket.io-client/dist/socket.io.js"></script>
-<script src="/angular-socket-io/socket.js"></script>
-
-<script src="js/services.js"></script>
-<script src="/angular-resource/angular-resource.js"></script>
-
-<script src="js/app.js"></script>
-<script src="js/services.js"></script>
-<script src="js/controllers.js"></script>
-<script src="js/filters.js"></script>
-<script src="js/directives.js"></script>
 </body>
 </html>

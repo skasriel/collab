@@ -3,7 +3,7 @@ var passport = require('passport'),
     Workroom = require('./models/workroom'),
     Message = require('./models/message');
 
-var HOME = '/main.html'
+var HOME = '/index.html'
 module.exports = function (app, io) {
   function IsAuthenticated(req,res,next) {
     if(req.isAuthenticated()){
@@ -47,7 +47,7 @@ module.exports = function (app, io) {
 
   app.get('/api/logout', function(req, res) {
       req.logout();
-      res.redirect('/register.html');
+      res.redirect('/login.html');
   });
 
 
@@ -194,7 +194,7 @@ module.exports = function (app, io) {
     console.log("in /api/workrooms/:id/messages "+req.params.id);
     var room = Workroom.findById(req.params.id, function (err, workroom) {
       if (err) return console.log(err);
-      console.log("looking up message(s): "+workroom.messages);
+      console.log("looking up message(s) for workroom: "+workroom.name);
       var messages = Message
         .find({'_id': { $in: workroom.messages} })
         .exec(
@@ -204,7 +204,7 @@ module.exports = function (app, io) {
           var roomname = new additionalParams();
           roomname.name = workroom.name;
           messages.unshift(roomname); //return workroom name first
-          console.log("returning message list: "+messages.length+" "+messages);
+          console.log("returning message list: "+messages.length);
           return res.send(messages);
         });
     });
@@ -219,14 +219,19 @@ module.exports = function (app, io) {
     console.log("POST /api/workrooms/:id/messages "+req.params.id);
     var room = Workroom.findById(req.params.id, function (err, workroom) {
       if (err) return console.log(err);
+      var now = Date.now();
       var message = new Message(
-        {'html': req.body.html,
-        'author': req.user._id,
-        'author_name': req.user.username}
+        {
+          'html': req.body.html,
+          'author': req.user._id,
+          'author_name': req.user.username,
+          'date': now
+        }
       );
-      console.log("current messages: "+workroom.messages+" "+workroom.messages.length);
+      console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
       workroom.messages.push(message);
       message.save();
+      workroom.modified = now;
       workroom.save();
 
       // notify websockets so all logged in users refresh their messages

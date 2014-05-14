@@ -5,7 +5,7 @@
 var checkLogin = function(status) {
   if (status == 401 || status==500) {
     console.log("got error "+status+" redirect to login screen");
-    window.top.location="/app/register.html";
+    window.top.location="/login.html";
     return false;
   }
   return true;

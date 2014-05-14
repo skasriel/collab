@@ -9,7 +9,7 @@
       <div class="panel-body">
         <ul class="list-unstyled">
           <li ng-repeat="message in messages">
-            <small class="pull-right">Dec 10 {{message.date}}</small>
+            <small class="pull-right">{{message.date | date : 'h:mm a'}}</small>
             <h4 class="sender">{{message.author_name}}</h4>
             <small>{{message.html}}</small>
           </li>

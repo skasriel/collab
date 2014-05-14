@@ -10,5 +10,6 @@ git push origin master
 git commit -a -m
 git push heroku master
 heroku ps:scale web=1
+heroku restart
 heroku open
 heroku logs --source app

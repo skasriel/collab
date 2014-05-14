@@ -4,10 +4,10 @@ var mongoose = require('mongoose'),
 
 
 var UserSchema = new Schema({
-  //username: {type: String, required: true, validate: [/[a-zA-Z0-9]/, 'user names should only have letters and numbers']},
-  firstname: {type: String, required: false},
-  lastname: {type: String, required: false},
-  displayname: {type: String, required: false}
+  // username, password are handled by passport
+  firstname: {type: String, required: false, trim: true},
+  lastname: {type: String, required: false, trim: true},
+  displayname: {type: String, required: false, trim: true}
 });
 
 UserSchema.plugin(passportLocalMongoose);
