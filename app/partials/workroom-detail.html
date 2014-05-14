@@ -25,7 +25,8 @@
             <div class="col-md-8">
               <ul class="list-unstyled">
                 <li ng-repeat="message in messages">
-                  {{message.html}} ({{message.author_name}})
+                  <b>{{message.author_name}}</b> {{message.date}}<br>
+                  {{message.html}}
                 </li>
               </ul>
             </div>

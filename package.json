@@ -1,9 +1,9 @@
 {
-  "name": "angular-seed",
+  "name": "collab",
   "private": true,
-  "version": "0.0.0",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
+  "version": "0.1.0",
+  "description": "My little collab side project",
+  "repository": "https://github.com/skasriel/collab",
   "license": "MIT",
 
 
@@ -23,8 +23,9 @@
     "shelljs": "^0.2.6",
     "karma-junit-reporter": "^0.2.2"
   },
+
   "scripts": {
-    "postinstall": "bower install",
+    "postinstall": "bower install app",
 
     "prestart": "npm install",
     "start": "http-server -a localhost -p 8000",
