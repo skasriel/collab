@@ -3,9 +3,7 @@ var express = require("express"),
     morgan = require("morgan"),
     cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
-    passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy;
-    //oDeskStrategy = require('passport-odesk').Strategy;
+    passport = require('passport');
 
 var application_root = __dirname,
     static_root = path.join(application_root, "../");
@@ -27,9 +25,7 @@ var mongoURL = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb:/
 console.log("Connecting to MongoDB on "+mongoURL);
 mongoose.connect(mongoURL);
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+require('./passport-config')(passport); // pass passport for configuration
 
 // config
 var app = express();
@@ -159,8 +155,10 @@ var io = require('socket.io').listen(server);
 io.sockets.on('connection', require('./routes/socket'));
 
 // Setup routes
-var routes = require('./routes');
-routes(app, io);
+require('./routes/auth')(app,io);
+require('./routes/user')(app,io);
+require('./routes/message')(app, io);
+require('./routes/workroom')(app, io);
 
 
 var port = Number(process.env.PORT || 3000);

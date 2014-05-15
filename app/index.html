@@ -58,24 +58,44 @@
             </ul>
         </div>
 
+      <!-- CHANNELS -->
       <h5 class="sidebartitle">Channels</h5>
-      <input ng-model="query" placeholder="Search #channels...">
       <ul class="nav nav-pills nav-stacked nav-bracket">
-
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query">
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query"><!-- | filter: {workroom.type: 'public'}">-->
           <a href="#/workrooms/{{workroom._id}}">
             <i class="fa fa-th-list"></i>
-            <span>#{{workroom.name}} ({{workroom.messages.length}}) <!-- | {{Date(workroom.modified)}} --></span>
+            <span>#{{workroom.name}}</span>
+            <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
           </a>
         </li>
       </ul>
-
+      <!--<input ng-model="query" class="form-control" placeholder="Search #channels...">-->
       <!-- Add new workroom -->
-      <a ng-href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Add... </a>
+      <a ng-href="#" data-toggle="modal" data-target="#AddWorkroomModal"> + Create new #channel... </a>
       <br>
 
       <!-- Join existing workrooms -->
-      <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join... </a>
+      <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join existing #channel... </a>
+
+
+
+
+      <!-- PEOPLE -->
+      <h5 class="sidebartitle">People</h5>
+      <ul class="nav nav-pills nav-stacked nav-bracket">
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {workroom.type: '1:1'}">
+          <a href="#/workrooms/{{workroom._id}}">
+            <i class="fa fa-th-list"></i>
+            <span>#{{workroom.name}}</span>
+            <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
+          </a>
+        </li>
+      </ul>
+      <!--<input ng-model="query" class="form-control" placeholder="Search people...">-->
+      <br>
+      <!-- Invite a person to join -->
+      <!--<a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join existing #channel... </a>-->
+
 
 
 
@@ -260,7 +280,9 @@
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                 <img src="images/photos/loggeduser.png" alt="" />
-                {{active_user}}
+                <span ng-controller="CurrentUserCtrl" class="text-muted">
+                  {{active_user}}
+                </span>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
@@ -590,7 +612,7 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-              <input type="text" class="form-control" ng-model="workroomName" placeholder="Workroom name" size="40">
+              <input type="text" class="form-control" ng-model="workroomName" placeholder="#Channel name" size="40">
           </div>
         </div>
         <div class="modal-footer">
@@ -658,8 +680,7 @@
 
           <div class="form-group">
             <label for="inviteUsers">Type or select the names of team members that you would like to invite:</label>
-            <!--<input type="text" class="form-control" ng-model="inviteUsers" id="inviteUsers" size="60">-->
-            <select ui-select2 ng-model="inviteUsers" id="inviteUsers" style="width:300px" multiple>
+            <select ui-select2 ng-model="inviteUsers" id="inviteUsers" style="width:500px" multiple>
                 <option ng-repeat="user in users" value="{{user._id}}">{{user.displayname}} ({{user.username}})</option>
             </select>
           </div>
