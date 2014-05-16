@@ -9,6 +9,7 @@ git push origin master
 # heroku
 git commit -a -m
 git push heroku master
+heroku config:set NODE_ENV=staging
 heroku ps:scale web=1
 heroku restart
 heroku open
