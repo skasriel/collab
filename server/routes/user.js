@@ -21,7 +21,7 @@ module.exports = function (app, io) {
     console.log("GET /api/users");
     return User
       .find()
-      .select(' _id username displayname avatarURL')
+      .select('_id username displayname avatarURL')
       .sort("displayname")
       .exec(function (err, users) {
         if (err) return console.log(err);
@@ -30,15 +30,24 @@ module.exports = function (app, io) {
       });
   });
 
-  // Returns the active user (for display next to logout link)
-  app.get('/api/user/my', IsAuthenticated, function (req, res) {
-    console.log("GET /api/active_user. User is: "+req.user.username);
-    return res.send(req.user);
+  // returns information about a specific user
+  app.get('/api/user/:username', IsAuthenticated, function (req, res) {
+    console.log("GET /api/user "+req.params.username);
+    var username = req.params.username;
+    if (username=='my') username = req.user.username;
+    return User
+      .findOne({'username' : username})
+      //.select('_id username firstname lastname displayname avatarURL userLocation mobilePhone twitterHandle blurb')
+      .exec(function (err, user) {
+        if (err) return console.log(err);
+        console.log("GET /api/user returns: "+user._id+" "+user.displayname);
+        return res.send(user);
+      });
   });
 
   // Submission of "Edit Profile" form
   app.post('/api/user/my', IsAuthenticated, function (req, res) {
-    console.log("POST /api/active_user. User is: "+req.user.username);
+    console.log("POST /api/active_user. User is: "+req.user.username+" body="+req.body);
     var user = User.findOne({'username' : req.user.username})
     .exec(
       function (err, user) {
@@ -49,10 +58,12 @@ module.exports = function (app, io) {
         user.firstname = req.body.firstname;
         user.lastname = req.body.lastname;
         user.displayname = req.body.displayname;
+        user.title = req.body.title;
         user.avatarURL = req.body.avatarURL;
         user.userLocation = req.body.userLocation;
         user.mobilePhone = req.body.mobilePhone;
         user.twitterHandle = req.body.twitterHandle;
+        user.skype = req.body.skype;
         user.blurb = req.body.blurb;
 
         user.save();
@@ -61,19 +72,6 @@ module.exports = function (app, io) {
       });
   });
 
-  // returns the list of all users
-  app.get('/api/users', IsAuthenticated, function (req, res) {
-    console.log("GET /api/users");
-    return User
-      .find()
-      .select('username displayname _id')
-      .sort("displayname")
-      .exec(function (err, users) {
-        if (err) return console.log(err);
-        console.log("GET /api/users returns: "+users.length);
-        return res.send(users);
-      });
-  });
 
 
 

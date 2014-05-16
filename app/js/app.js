@@ -6,7 +6,7 @@ var workplaceApp = angular.module('workplaceApp',
   ['ngRoute', 'workplaceControllers', 'workroomServices',
     'socketio.services',  'btford.socket-io',
     'ui.select2',
-    'angularFileUpload', 'angularjs-gravatardirective'])
+    'angularFileUpload' /*, 'angularjs-gravatardirective'*/])
   .config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider.

@@ -8,7 +8,7 @@ var UserSchema = new Schema({
   lastname: {type: String, required: false, trim: true},
   displayname: {type: String, required: true, trim: true},
   avatarURL: String,
-
+  title: String,
   userLocation: String,
   mobilePhone: String,
   twitterHandle: String,
@@ -26,16 +26,15 @@ var UserSchema = new Schema({
 
   // oDesk credentials
   odesk           : {
-    id           : String,
     token        : String,
-    email        : String,
-    name         : String
   }
 
 
 });
 
+
 UserSchema.plugin(passportLocalMongoose);
+UserSchema.path('username').index({ unique: true });
 module.exports = mongoose.model('User', UserSchema);
 module.exports.UserSchema = UserSchema;
 

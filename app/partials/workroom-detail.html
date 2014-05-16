@@ -39,7 +39,7 @@
       <div class="col-md-10">
         <form ng-controller="AddMessageController" class="form-inline" role="form">
           <div class="form-group">
-                <input type="textarea" class="form-control" ng-model="message" autofocus="autofocus" placeholder="Type your message here..." size="60">
+                <input type="textarea" id="new_message" class="form-control" ng-model="message" autofocus="autofocus" placeholder="Type your message here..." size="60">
           </div>
           <button type="submit" class="btn btn-primary" ng-click='PostMessage();'>Send</button>
         </form>

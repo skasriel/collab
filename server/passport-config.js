@@ -35,6 +35,12 @@ module.exports = function(passport) {
     passport.deserializeUser(User.deserializeUser());
 
 
+    function buildUserNameFromOdeskProfile(profile) {
+      if (!profile || !profile.name || !profile.name.givenName || !profile.name.familyName) {
+        throw new Error("Invalid oDesk profile: "+profile);
+      }
+      return profile.name.givenName+"."+profile.name.familyName;
+    }
     // oDesk passport
     passport.use(new oDeskStrategy({
       consumerKey: configAuth.oDeskAuth.clientID,
@@ -42,90 +48,44 @@ module.exports = function(passport) {
       callbackURL: configAuth.oDeskAuth.callbackURL
     },
     function(req, token, tokenSecret, profile, done) {
-      console.log("verifying oDesk signin: "+profile.id+" found email="+profile.emails.length+" "+profile.emails[0].value);
+      console.log("verifying oDesk signin: "+profile.id+" "+profile.name.givenName+" "+profile.name.familyName);
       process.nextTick(function () {
 
-
-      if (!req.user) {
-        User.findOne({ 'odesk.id' : profile.id }, function(err, user) {
-            if (err)
-              return done(err);
-
-            if (user && profile.id) {
-                console.log("found odesk user: "+user);
-                // if there is a user id already but no token (user was linked at one point and then removed)
-                if (!user.odesk.token) {
-                  console.log("no odesk token: creating");
-                  user.odesk.token = token;
-                  user.odesk.name  = profile.displayName;
-                  user.odesk.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email (always null...)
-
-                  // come up with a username and display name based on data returned by odesk (e.g. no email)
-                  user.username = user.odesk.name.givenName+"."+user.odesk.name.familyName; //user.odesk.email;
-                  user.displayname = profile.displayName;
-                  user.firstname = user.odesk.name.givenName;
-                  user.lastname = user.odesk.name.familyName;
-                  user.avatarURL = user.odesk.img;
-                  console.log("creating user: "+user.displayname);
-
-                  user.save(function(err) {
-                      if (err)
-                          throw err;
-                      console.log("saved user: "+user);
-                      return done(null, user);
-                  });
-                }
-                return done(null, user);
-            } else {
-              console.log("existing odesk user with token:"
-                + profile.id + ","
-                + token + ","
-                + profile.displayName+","
-                + profile.name.givenName+" "+profile.name.familyName+" "
-                + profile.img
-                );
-              var newUser = new User();
-              newUser.odesk.id    = profile.id;
-              newUser.odesk.token = token;
-              newUser.odesk.name  = profile.displayName;
-              newUser.odesk.displayName  = profile.displayName;
-              newUser.odesk.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-              // come up with a username and display name based on data returned by google
-              newUser.username = profile.name.givenName+"."+profile.name.familyName; //newUser.odesk.email;
-              newUser.displayname = profile.displayName;
-              newUser.firstname = profile.name.givenName;
-              newUser.lastname = profile.name.familyName;
-              newUser.avatarURL = profile.img;
-
-              newUser.save(function(err) {
-                if (err) throw err;
-                console.log("saved user: "+newUser);
-                return done(null, newUser);
-              });
-            }
-        });
-      } else {
-        // user already exists and is logged in, we have to link accounts
-        var user = req.user; // pull the user out of the session
-        console.log("existing odesk user: "+user+" "+user.username+" "+user.displayname);
-
-        user.odesk.id    = profile.id;
-        user.odesk.token = token;
-        user.odesk.name  = profile.displayName;
-        user.odesk.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-        user.odesk.emails = [{"value":user.odesk.email,"type":"work"}],
-
-        // come up with a username and display name based on data returned by google
-        //user.username = user.odesk.email;
-        //user.displayname = user.odesk.name;
-
-        user.save(function(err) {
-            if (err)
-                throw err;
-            return done(null, user);
-        });
+      if (req.user) {
+        throw new Error("User is already logged in");
       }
+      User.findOne({ 'username' : buildUserNameFromOdeskProfile(profile) },
+        function(err, user) {
+          if (err)
+            return done(err);
+
+          if (user) {
+            console.log("Found user, ok: "+user.username+" "+user.displayname);
+            return done(null, user);
+          } else {
+            console.log("Creating user based on odesk info:"
+              + profile.id + ","
+              + token + ","
+              + profile.displayName+","
+              + profile.name.givenName+" "+profile.name.familyName+" "
+              + profile.img
+              );
+            var newUser = new User();
+            newUser.odesk.token = token;
+            // come up with a username and display name based on data returned by google
+            newUser.username = buildUserNameFromOdeskProfile(profile);
+            newUser.displayname = profile.displayName;
+            newUser.firstname = profile.name.givenName;
+            newUser.lastname = profile.name.familyName;
+            newUser.avatarURL = profile.img;
+
+            newUser.save(function(err) {
+              if (err) throw err;
+              console.log("saved user: "+newUser);
+              return done(null, newUser);
+            });
+          }
+      });
     });
   }));
 

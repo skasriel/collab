@@ -18,8 +18,8 @@
         <div class="form-group">
           <label class="col-sm-3 control-label">Name</label>
           <div class="col-sm-5">
-            <input type="text" placeholder="First name" ng-model="firstname" class="form-control">
-            <input type="text" placeholder="Last name" ng-model="lastname" class="form-control">
+            <input type="text" placeholder="First name" ng-model="user.firstname" class="form-control">
+            <input type="text" placeholder="Last name" ng-model="user.lastname" class="form-control">
           </div>
         </div>
         <div class="form-group">
@@ -27,15 +27,22 @@
           <div class="col-sm-5">
             <div class="input-group mb15">
               <span class="input-group-addon">@</span>
-              <input type="text" placeholder="Username" ng-model="username" class="form-control" disabled="" />
+              <input type="text" placeholder="Username" ng-model="user.username" class="form-control" disabled="" />
             </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Job Title</label>
+          <div class="col-sm-5">
+            <input type="text" placeholder="Job Title" ng-model="user.title" class="form-control">
           </div>
         </div>
 
         <div class="form-group">
           <label class="col-sm-3 control-label">Location</label>
           <div class="col-sm-5">
-            <input type="text" placeholder="City, State, Country..." ng-model="userLocation" class="form-control">
+            <input type="text" placeholder="City, State, Country..." ng-model="user.userLocation" class="form-control">
           </div>
         </div>
 
@@ -48,7 +55,7 @@
             <gravatar-image data-gravatar-email="username" data-gravatar-size="120" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="btn btn-large"></gravatar-image>
           -->
 
-            <input type="text" placeholder="URL for your profile picture" ng-model="avatarURL" class="form-control">
+            <input type="text" placeholder="URL for your profile picture" ng-model="user.avatarURL" class="form-control">
             <p class="col-sm-5">Give us a pic, by URL. Go to <a href="http://www.gravatar.com">Gravatar</a> to get one </p>
           </div>
         </div>
@@ -57,16 +64,16 @@
         <div class="form-group">
           <label class="col-sm-3 control-label">Contact details</label>
           <div class="col-sm-5">
-            <input type="text" placeholder="Mobile #" ng-model="mobilePhone" class="form-control">
-            <input type="text" placeholder="Twitter handle" ng-model="twitterHandle" class="form-control">
-            <input type="text" placeholder="Skype ID" ng-model="skype" class="form-control">
+            <input type="text" placeholder="Mobile #" ng-model="user.mobilePhone" class="form-control">
+            <input type="text" placeholder="Twitter handle" ng-model="user.twitterHandle" class="form-control">
+            <input type="text" placeholder="Skype ID" ng-model="user.skype" class="form-control">
           </div>
         </div>
 
         <div class="form-group">
           <label class="col-sm-3 control-label">Profile blurb</label>
           <div class="col-sm-5">
-            <input type="textarea" placeholder="Say something exciting about yourself..." ng-model="blurb" class="form-control">
+            <input type="textarea" placeholder="Say something exciting about yourself..." ng-model="user.blurb" class="form-control">
           </div>
         </div>
 

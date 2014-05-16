@@ -90,6 +90,29 @@ workroomControllers.controller('AddMessageController', ['$scope', '$routeParams'
             console.log("Post message error: "+status+" "+data.error);
           });
       }
+
+      $scope.populateMentionBox = function() {
+        $http.get('/api/users/').success(function(data) {
+          //console.log("user data: "+data+" "+data.length+" $scope="+$scope);
+          // Init the Mention.js
+          var userData = [];
+          for (var i=0; i<data.length; i++) {
+            if (data[i].username == $scope.active_user.username) // can't mention myself
+              continue;
+            userData.push({
+              name: data[i].displayname,
+              username: data[i].username,
+              image: data[i].avatarURL
+            });
+          }
+          $("#new_message").mention({
+            users: userData
+          });
+
+        });
+      }
+      $scope.populateMentionBox();
+
     }]);
 
 // create a new work room
@@ -170,6 +193,7 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
         });
       }
 
+      // get all users to display in the drop down
       $scope.getUserList = function() {
         $http.get('/api/users/').success(function(data) {
           //console.log("user data: "+data+" "+data.length+" $scope="+$scope);
@@ -184,15 +208,15 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
   workroomControllers.controller('UserSettingsCtrl', ['$scope', '$routeParams', '$http', '$upload',
     function ($scope, $routeParams, $http, $upload) {
       $http.get('/api/user/my').success(function(data) {
-
-        $scope.username = data.username;
+        $scope.user = data;
+        /*username = data.username;
         $scope.firstname = data.firstname;
         $scope.lastname = data.lastname;
         $scope.avatarURL = data.avatarURL;
         $scope.userLocation = data.userLocation;
         $scope.mobilePhone = data.mobilePhone;
         $scope.twitterHandle = data.twitterHandle;
-        $scope.blurb = data.blurb;
+        $scope.blurb = data.blurb;*/
 
         console.log("user data: "+data.username+" "+data.firstname+" "+data.lastname+" "+data.avatarURL);
 
@@ -225,16 +249,18 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
 
         // submit form
         $scope.PostUserSettings = function() {
-          $http.post('/api/user/my', {
-            'firstname': $scope.firstname,
-            'lastname' : $scope.lastname,
-            'displayname' : $scope.firstname + ' ' + $scope.lastname,
-            'avatarURL' : $scope.avatarURL,
-            'userLocation' : $scope.userLocation,
-            'mobilePhone' : $scope.mobilePhone,
-            'twitterHandle' : $scope.twitterHandle,
-            'blurb': $scope.blurb
-          }
+          $http.post('/api/user/my', $scope.user
+          /*{
+            'firstname': $scope.user.firstname,
+            'lastname' : $scope.user.lastname,
+            'displayname' : $scope.user.firstname + ' ' + $scope.user.lastname,
+            'title' : $scope.user.title,
+            'avatarURL' : $scope.user.avatarURL,
+            'userLocation' : $scope.user.userLocation,
+            'mobilePhone' : $scope.user.mobilePhone,
+            'twitterHandle' : $scope.user.twitterHandle,
+            'blurb': $scope.user.blurb
+          }*/
           ).success(function(data, status, headers, config) {
             console.log("success: updated profile");
             //$window.location.reload(); // forcing a reload, because this scope isn't the right one and it's just easier that way...
