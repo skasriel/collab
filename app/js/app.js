@@ -24,7 +24,7 @@ var workplaceApp = angular.module('workplaceApp',
     }).
     when('/user/:userName/', {
       templateUrl: 'partials/profile.html',
-      controller: 'ProfileCtrl'
+      controller: 'UserSettingsCtrl'
     }).
     when('/user-settings/:userName/', {
       templateUrl: 'partials/user-settings.html',
