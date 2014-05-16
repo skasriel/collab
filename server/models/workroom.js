@@ -5,6 +5,7 @@ var WorkroomSchema = new Schema({
   name: {type: String, required: true, unique: true, trim: true},
   messages: [ {type: Schema.ObjectId, ref: 'MessageSchema'} ],
   users: [ {type: Schema.ObjectId, ref: 'UserSchema'} ],
+  type: {type: String, enum: ["public", "1:1", "private"], default: "public" },
   modified: { type: Date, default: Date.now }
 });
 WorkroomSchema.path('name').validate(function (v) {

@@ -7,8 +7,14 @@ var UserSchema = new Schema({
   firstname: {type: String, required: false, trim: true},
   lastname: {type: String, required: false, trim: true},
   displayname: {type: String, required: true, trim: true},
+  avatarURL: String,
 
-  // username, password are handled by passport
+  userLocation: String,
+  mobilePhone: String,
+  twitterHandle: String,
+  blurb: String,
+
+  // username, password are handled by local passport
 
   // google credentials
   google           : {
@@ -31,3 +37,6 @@ var UserSchema = new Schema({
 
 UserSchema.plugin(passportLocalMongoose);
 module.exports = mongoose.model('User', UserSchema);
+module.exports.UserSchema = UserSchema;
+
+console.log("registered user schema");

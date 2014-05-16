@@ -42,7 +42,7 @@ module.exports = function(passport) {
       callbackURL: configAuth.oDeskAuth.callbackURL
     },
     function(req, token, tokenSecret, profile, done) {
-      console.log("verifying oDesk signin: "+profile+" found email="+profile.emails.length+" "+profile.emails[0].value);
+      console.log("verifying oDesk signin: "+profile.id+" found email="+profile.emails.length+" "+profile.emails[0].value);
       process.nextTick(function () {
 
 
@@ -51,7 +51,7 @@ module.exports = function(passport) {
             if (err)
               return done(err);
 
-            if (user) {
+            if (user && profile.id) {
                 console.log("found odesk user: "+user);
                 // if there is a user id already but no token (user was linked at one point and then removed)
                 if (!user.odesk.token) {
@@ -62,11 +62,11 @@ module.exports = function(passport) {
 
                   // come up with a username and display name based on data returned by odesk (e.g. no email)
                   user.username = user.odesk.name.givenName+"."+user.odesk.name.familyName; //user.odesk.email;
-                  user.displayname = user.odesk.displayName;
+                  user.displayname = profile.displayName;
                   user.firstname = user.odesk.name.givenName;
                   user.lastname = user.odesk.name.familyName;
                   user.avatarURL = user.odesk.img;
-
+                  console.log("creating user: "+user.displayname);
 
                   user.save(function(err) {
                       if (err)

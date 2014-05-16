@@ -1,5 +1,6 @@
 /* Routes related to workrooms */
 var Workroom = require('../models/workroom');
+var User = require('../models/user');
 
 module.exports = function (app, io) {
 

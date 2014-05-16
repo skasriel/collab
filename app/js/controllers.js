@@ -12,12 +12,13 @@ var checkLogin = function(status) {
 }
 var workroomControllers = angular.module('workplaceControllers', []);
 
-// Get name of currently logged in user
+// Get information about currently logged in user
 workroomControllers.controller('CurrentUserCtrl', ['$scope', '$http',
   function ($scope, $http) {
     console.log('getting active user');
-    $http.get('/api/active_user').success(function(data) {
+    $http.get('/api/user/my').success(function(data) {
       $scope.active_user = data;
+      $scope.$parent.active_user = data;
       console.log(' active user: '+data);
     })
     .error(function(data, status) {
@@ -176,5 +177,72 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
         });
       }
       $scope.getUserList();
+    }
+  ]);
+
+  // User Settings
+  workroomControllers.controller('UserSettingsCtrl', ['$scope', '$routeParams', '$http', '$upload',
+    function ($scope, $routeParams, $http, $upload) {
+      $http.get('/api/user/my').success(function(data) {
+
+        $scope.username = data.username;
+        $scope.firstname = data.firstname;
+        $scope.lastname = data.lastname;
+        $scope.avatarURL = data.avatarURL;
+        $scope.userLocation = data.userLocation;
+        $scope.mobilePhone = data.mobilePhone;
+        $scope.twitterHandle = data.twitterHandle;
+        $scope.blurb = data.blurb;
+
+        console.log("user data: "+data.username+" "+data.firstname+" "+data.lastname+" "+data.avatarURL);
+
+        // manages file upload for avatar pic (TBD)
+        /*$scope.onFileSelect = function($files) {
+          //$files: an array of files selected, each file has name, size, and type.
+          var file = $files[0];
+          $scope.upload = $upload.upload({
+            url: 'server/upload/url', //upload.php script, node.js route, or servlet url
+            // method: 'POST' or 'PUT',
+            // headers: {'header-key': 'header-value'},
+            // withCredentials: true,
+            data: {myObj: $scope.myModelObj},
+            file: file, // or list of files: $files for html5 only
+            // set the file formData name ('Content-Desposition'). Default is 'file'
+            //fileFormDataName: myFile, //or a list of names for multiple files (html5).
+            // customize how data is added to formData. See #40#issuecomment-28612000 for sample code
+            //formDataAppender: function(formData, key, val){}
+          }).progress(function(evt) {
+            console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+          }).success(function(data, status, headers, config) {
+            // file is uploaded successfully
+            console.log(data);
+          });
+          //.error(...)
+          //.then(success, error, progress);
+          //.xhr(function(xhr){xhr.upload.addEventListener(...)})// access and attach any event listener to XMLHttpRequest.
+        }*/
+
+
+        // submit form
+        $scope.PostUserSettings = function() {
+          $http.post('/api/user/my', {
+            'firstname': $scope.firstname,
+            'lastname' : $scope.lastname,
+            'displayname' : $scope.firstname + ' ' + $scope.lastname,
+            'avatarURL' : $scope.avatarURL,
+            'userLocation' : $scope.userLocation,
+            'mobilePhone' : $scope.mobilePhone,
+            'twitterHandle' : $scope.twitterHandle,
+            'blurb': $scope.blurb
+          }
+          ).success(function(data, status, headers, config) {
+            console.log("success: updated profile");
+            //$window.location.reload(); // forcing a reload, because this scope isn't the right one and it's just easier that way...
+          }).error(function(data, status) {
+            console.log("Post message error: "+status+" "+data.error);
+          });
+        }
+
+      });
     }
   ]);

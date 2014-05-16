@@ -28,6 +28,7 @@
 <div id="preloader">
     <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
 </div>
+<div ng-controller="CurrentUserCtrl"></div>
 
 <section>
 
@@ -95,9 +96,6 @@
       <br>
       <!-- Invite a person to join -->
       <!--<a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join existing #channel... </a>-->
-
-
-
 
     </div><!-- leftpanelinner -->
   </div><!-- leftpanel -->
@@ -279,15 +277,15 @@
           <li>
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                <img src="images/photos/loggeduser.png" alt="" />
-                <span ng-controller="CurrentUserCtrl" class="text-muted">
-                  {{active_user}}
+                <img ng-src="{{active_user.avatarURL}}"  /> <!--"images/photos/loggeduser.png"-->
+                <span class="text-muted">
+                  {{active_user.username}}
                 </span>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
-                <li><a href="profile.html"><i class="glyphicon glyphicon-user"></i> My Profile</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-cog"></i> Account Settings</a></li>
+                <li><a href="#/user/{{active_user.username}}"><i class="glyphicon glyphicon-user"></i> My Profile</a></li>
+                <li><a href="#/user-settings/{{active_user.username}}"><i class="glyphicon glyphicon-cog"></i> Account Settings</a></li>
                 <li><a href="#"><i class="glyphicon glyphicon-question-sign"></i> Help</a></li>
                 <li><a href="/api/logout"><i class="glyphicon glyphicon-log-out"></i> Log Out</a></li>
               </ul>
@@ -617,7 +615,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" ng-click='CreateWorkroom();'>Create workroom</button>
+          <button type="button" class="btn btn-primary" ng-click='CreateWorkroom();'>Create #channel</button>
         </div>
       </form>
     </div>
@@ -707,8 +705,9 @@
 
 <script src="js/custom.js"></script>
 
-
+<script src="/ng-file-upload/angular-file-upload-shim.js"></script>
 <script src="/angular/angular.js"></script>
+<script src="/ng-file-upload/angular-file-upload.js"></script>
 <script src="/angular-route/angular-route.js"></script>
 
 <script src="/select2/select2.js"></script>
@@ -719,6 +718,8 @@
 
 <script src="js/services.js"></script>
 <script src="/angular-resource/angular-resource.js"></script>
+
+<script src="/angularjs-gravatardirective/dist/angularjs-gravatardirective.js"></script>
 
 <script src="js/app.js"></script>
 <script src="js/services.js"></script>

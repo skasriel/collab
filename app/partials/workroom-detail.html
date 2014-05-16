@@ -8,10 +8,18 @@
     <div class="panel panel-default panel-alt widget-messaging">
       <div class="panel-body">
         <ul class="list-unstyled">
-          <li ng-repeat="message in messages">
-            <small class="pull-right">{{message.date | date : 'h:mm a'}}</small>
-            <h4 class="sender">{{message.author_name}}</h4>
-            <small>{{message.html}}</small>
+          <li ng-repeat="message in messages" class="new">
+
+            <div class="media">
+              <a href="#" class="pull-left">
+                <img ng-src="{{message.author.avatarURL}}" class="media-object">
+              </a>
+              <div class="media-body">
+                  <small class="media-meta pull-right">{{message.date | date : 'h:mm a'}}</small>
+                  <h4 class="sender">{{message.author.displayname}}</h4>
+                  <small>{{message.html}}</small>
+              </div>
+            </div>
           </li>
         </ul>
       </div><!-- panel-body -->

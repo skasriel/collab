@@ -1,6 +1,8 @@
 /* Routes related to messages */
 var Message = require('../models/message');
 var Workroom = require('../models/workroom');
+var User = require('../models/user');
+var UserSchema = User.UserSchema;
 
 module.exports = function (app, io) {
 
@@ -31,6 +33,7 @@ module.exports = function (app, io) {
       console.log("looking up message(s) for workroom: "+workroom.name);
       var messages = Message
         .find({'_id': { $in: workroom.messages} })
+        .populate('author', 'displayname avatarURL')
         .exec(
         function (err, messages) {
           if (err) return console.log(err);

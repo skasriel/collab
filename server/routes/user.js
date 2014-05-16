@@ -1,5 +1,6 @@
 /* Routes related to users */
-
+var Message = require('../models/message');
+var Workroom = require('../models/workroom');
 var User = require('../models/user');
 
 
@@ -15,10 +16,49 @@ module.exports = function (app, io) {
   }
 
 
+  // returns the list of all users
+  app.get('/api/users', IsAuthenticated, function (req, res) {
+    console.log("GET /api/users");
+    return User
+      .find()
+      .select(' _id username displayname avatarURL')
+      .sort("displayname")
+      .exec(function (err, users) {
+        if (err) return console.log(err);
+        console.log("GET /api/users returns: "+users.length);
+        return res.send(users);
+      });
+  });
+
   // Returns the active user (for display next to logout link)
-  app.get('/api/active_user', IsAuthenticated, function (req, res) {
+  app.get('/api/user/my', IsAuthenticated, function (req, res) {
     console.log("GET /api/active_user. User is: "+req.user.username);
-    return res.send(req.user.username);
+    return res.send(req.user);
+  });
+
+  // Submission of "Edit Profile" form
+  app.post('/api/user/my', IsAuthenticated, function (req, res) {
+    console.log("POST /api/active_user. User is: "+req.user.username);
+    var user = User.findOne({'username' : req.user.username})
+    .exec(
+      function (err, user) {
+        if (err) {
+          console.log(err);
+          return next(new Error(401));
+        }
+        user.firstname = req.body.firstname;
+        user.lastname = req.body.lastname;
+        user.displayname = req.body.displayname;
+        user.avatarURL = req.body.avatarURL;
+        user.userLocation = req.body.userLocation;
+        user.mobilePhone = req.body.mobilePhone;
+        user.twitterHandle = req.body.twitterHandle;
+        user.blurb = req.body.blurb;
+
+        user.save();
+        console.log("Changed settings for user "+user.username);
+        return res.send(user);
+      });
   });
 
   // returns the list of all users
@@ -34,8 +74,6 @@ module.exports = function (app, io) {
         return res.send(users);
       });
   });
-
-
 
 
 

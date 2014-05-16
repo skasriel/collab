@@ -2,7 +2,11 @@
 
 
 // Angular Workplace module
-var workplaceApp = angular.module('workplaceApp', ['ngRoute', 'workplaceControllers', 'workroomServices', 'socketio.services',  'btford.socket-io', 'ui.select2'])
+var workplaceApp = angular.module('workplaceApp',
+  ['ngRoute', 'workplaceControllers', 'workroomServices',
+    'socketio.services',  'btford.socket-io',
+    'ui.select2',
+    'angularFileUpload', 'angularjs-gravatardirective'])
   .config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider.
@@ -17,6 +21,14 @@ var workplaceApp = angular.module('workplaceApp', ['ngRoute', 'workplaceControll
     when('/workrooms/:workroomId/users', {
       templateUrl: 'partials/workroom-users.html',
       controller: 'WorkroomUsersCtrl'
+    }).
+    when('/user/:userName/', {
+      templateUrl: 'partials/profile.html',
+      controller: 'ProfileCtrl'
+    }).
+    when('/user-settings/:userName/', {
+      templateUrl: 'partials/user-settings.html',
+      controller: 'UserSettingsCtrl'
     }).
     otherwise({
       redirectTo: '/workrooms'

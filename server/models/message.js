@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 
 var MessageSchema = new Schema({
     html: {type: String, required: true},
-    author: {type: Schema.ObjectId, ref: 'UserSchema', required: true},
+    author: {type: Schema.ObjectId, ref: 'User', required: true},
     author_name: {type: String, required: true},
     date: { type: Date }
 });

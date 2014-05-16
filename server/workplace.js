@@ -38,7 +38,7 @@ app.configure(function() {
   app.use(express.static(path.join(application_root, "../bower_components/")));
   app.use(express.static(path.join(application_root, "../app/")));
   app.use(express.static(path.join(application_root, "../app/template/")));
-  app.use(express.static(path.join(application_root, "../")));
+  app.use('/bower_components', express.static(path.join(application_root, "../bower_components")));
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.session({ secret: 'keyboard cat' }));
