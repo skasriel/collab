@@ -1,10 +1,32 @@
 /* Routes related to messages */
-var Message = require('../models/message');
+var MessageFile = require('../models/message');
+var Message=MessageFile.Message, JoinMessage=MessageFile.JoinMessage;
 var Workroom = require('../models/workroom');
 var User = require('../models/user');
 var UserSchema = User.UserSchema;
 
 module.exports = function (app, io) {
+
+  module.exports.addMessageToRoom =
+    function (room, message) {
+      console.log("adding message"+message+" to "+room.name);
+      var now = Date.now();
+      message.date = now;
+      message.save();
+      room.modified = now;
+      room.messages.push(message);
+      room.save();
+
+      // notify websockets so all logged in users refresh their messages
+      // TODO: note that this isn't secure at all: should only send contents to users who are part of this room
+      io.sockets.emit('send:message', {
+        user: message.author_name,
+        room: room._id,
+        message: message.html
+      });
+
+    };
+  var addMessageToRoom = module.exports.addMessageToRoom;
 
   function IsAuthenticated(req,res,next) {
     if(req.isAuthenticated()){
@@ -66,18 +88,8 @@ module.exports = function (app, io) {
         }
       );
       console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
-      workroom.messages.push(message);
-      message.save();
-      workroom.modified = now;
-      workroom.save();
+      addMessageToRoom(workroom, message);
 
-      // notify websockets so all logged in users refresh their messages
-      // TODO: note that this isn't secure at all: should only send contents to users who are part of this room
-      io.sockets.emit('send:message', {
-        user: message.author_name,
-        room: req.params.id,
-        message: message.html
-      });
 
       console.log("Posted: "+message);
       return res.send(message);

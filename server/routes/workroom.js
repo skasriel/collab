@@ -13,44 +13,17 @@ module.exports = function (app, io) {
     }
   }
 
-  // List workrooms this user has joined
-  app.get('/api/my-workrooms', IsAuthenticated, function (req, res) {
-    console.log("GET /api/my-workrooms. User is: "+req.user.username);
-    return Workroom
-      .find()
-      .sort("name _id")
-      .exec(function (err, workrooms) {
-        if (err) return console.log(err);
-        // inefficient, but works for now: return the subset of rooms that this user has joined
-        var allowed = new Array();
-        console.log("Checking access to: "+workrooms.length+" workrooms");
-        for(i=0; i<workrooms.length; i++) {
-          var room = workrooms[i];
-          var roomUsers = room.users;
-          if (!roomUsers) continue;
-          for (j=0; j<roomUsers.length; j++) {
-            var roomUser = roomUsers[j];
-            if (req.user._id.equals(roomUser)) {
-              //console.log("user match: "+roomUser+" is member of room: "+room.name);
-              allowed.push(room);
-              break;
-            }
-          }
-        }
-        console.log("returns: "+allowed.length+" allowed rooms from a total of "+workrooms.length);
-        return res.send(allowed);
-      });
-  });
 
-  // List all available workrooms to this user (including the ones she hasn't joined)
-  app.get('/api/all-workrooms', IsAuthenticated, function (req, res) {
-    console.log("GET /api/all-workrooms. User is: "+req.user.username);
+  // List workrooms this user has joined
+  app.get('/api/workrooms/:listType', IsAuthenticated, function (req, res) {
+    console.log("GET /api/workrooms/"+req.params.listType+". User is: "+req.user.username);
     return Workroom
       .find()
       .sort("name")
       .exec(function (err, workrooms) {
         if (err) return console.log(err);
         var roomList = new Array();
+        // inefficient, but works for now: return the subset of rooms that this user has joined
         for(i=0; i<workrooms.length; i++) {
           var room = workrooms[i];
           var roomUsers = room.users;
@@ -59,19 +32,26 @@ module.exports = function (app, io) {
           for (j=0; j<roomUsers.length; j++) {
             var roomUser = roomUsers[j];
             if (req.user._id.equals(roomUser)) {
-              isMember = true;
+              isMember=true;
               break;
             }
           }
-          //console.log(roomUser+" membership to "+room.name+" is "+isMember);
-          var roomObj = {"name": room.name, "_id": room._id, "member": (isMember?"yes":"no")};
-          roomList.push(roomObj);
+          if (req.params.listType=='all' || isMember) {
+            // add to list: either client requested all rooms, or if it requested "my" rooms, this one fits the bill
+            var roomObj = {
+              "name": room.name,
+              "_id": room._id,
+              "type": room.type,
+              "modified": room.modified,
+              "member": (isMember?"yes":"no")
+            };
+            roomList.push(roomObj);
+          }
         }
-        console.log("all-workrooms returns: "+roomList.length);
+        console.log("returns: "+roomList.length+" allowed rooms from a total of "+workrooms.length);
         return res.send(roomList);
       });
   });
-
 
   // Add a new workroom
   PostToWorkroom = function(io) {

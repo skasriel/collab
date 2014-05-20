@@ -3,6 +3,7 @@ var express = require("express"),
     morgan = require("morgan"),
     cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
+    mongoStore = require('connect-mongo')(express)
     passport = require('passport');
 
 var application_root = __dirname,
@@ -41,7 +42,12 @@ app.configure(function() {
   app.use('/bower_components', express.static(path.join(application_root, "../bower_components")));
   app.use(express.cookieParser());
   app.use(express.bodyParser());
-  app.use(express.session({ secret: 'keyboard cat' }));
+  //app.use(express.session({ secret: 'keyboard cat' }));
+  app.use(express.session({
+        store : new mongoStore({url : mongoURL}),
+        secret : "stephane secret --- change in prod", //process.env.SESSION_SECRET,
+        maxAge : 24*3600*1000
+    }));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);

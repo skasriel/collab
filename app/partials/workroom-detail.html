@@ -1,5 +1,5 @@
 <div class="pageheader">
-  <h2><i class="fa fa-home"></i> #{{workroomName}} <span>Messages<a href="#/workrooms/{{workroomId}}/users"> | Users...</a></span></h2>
+  <h2><i class="fa fa-home"></i> #{{workroomName}}<span>Messages<a href="#/workrooms/{{workroomId}}/users"> | Users...</a></span></h2>
 </div>
 
 <div class="contentpanel">
@@ -17,7 +17,7 @@
               <div class="media-body">
                   <small class="media-meta pull-right">{{message.date | date : 'h:mm a'}}</small>
                   <h4 class="sender">{{message.author.displayname}}</h4>
-                  <small>{{message.html}}</small>
+                  <small ng-bind-html="message.trustedHTML"></small> <!-- security risk: not filtering HTML at all -->
               </div>
             </div>
           </li>
@@ -41,7 +41,7 @@
           <div class="form-group">
                 <input type="textarea" id="new_message" class="form-control" ng-model="message" autofocus="autofocus" placeholder="Type your message here..." size="60">
           </div>
-          <button type="submit" class="btn btn-primary" ng-click='PostMessage();'>Send</button>
+          <button type="submit" class="btn btn-primary" ng-click="PostMessage();">Send</button>
         </form>
       </div>
     </div>

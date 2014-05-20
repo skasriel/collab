@@ -6,7 +6,8 @@ var workplaceApp = angular.module('workplaceApp',
   ['ngRoute', 'workplaceControllers', 'workroomServices',
     'socketio.services',  'btford.socket-io',
     'ui.select2',
-    'angularFileUpload' /*, 'angularjs-gravatardirective'*/])
+    'ngSanitize'
+    /*, 'angularFileUpload' , 'angularjs-gravatardirective'*/])
   .config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider.
@@ -22,11 +23,11 @@ var workplaceApp = angular.module('workplaceApp',
       templateUrl: 'partials/workroom-users.html',
       controller: 'WorkroomUsersCtrl'
     }).
-    when('/user/:userName/', {
+    when('/profile/@:userName/', {
       templateUrl: 'partials/profile.html',
-      controller: 'UserSettingsCtrl'
+      controller: 'UserProfileCtrl'
     }).
-    when('/user-settings/:userName/', {
+    when('/user-settings/@:userName/', {
       templateUrl: 'partials/user-settings.html',
       controller: 'UserSettingsCtrl'
     }).

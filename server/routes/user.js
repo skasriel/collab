@@ -1,7 +1,10 @@
 /* Routes related to users */
-var Message = require('../models/message');
+var MessageModule = require('../models/message'),
+  Message = MessageModule.Message,
+  JoinMessage = MessageModule.JoinMessage;
 var Workroom = require('../models/workroom');
 var User = require('../models/user');
+var MessageController = require("./message");
 
 
 module.exports = function (app, io) {
@@ -84,13 +87,6 @@ module.exports = function (app, io) {
           return next(new Error(401));
         }
 
-        /*
-        //username: {type: String, required: true, validate: [/[a-zA-Z0-9]/, 'user names should only have letters and numbers']},
-        firstname: {type: String, required: false},
-        lastname: {type: String, required: false},
-        displayname: {type: String, required: false}
-
-        */
         var users = User.find({'_id': { $in: workroom.users} })
         .select('username displayname _id')
         .exec(
@@ -120,26 +116,58 @@ module.exports = function (app, io) {
         return a;
     };
 
-    // Invite one ore more users to a room
+    // Invite one ore more users to a room or allow a user to join a workroom
     app.post('/api/workrooms/:id/users', IsAuthenticated, function (req, res) {
-      var inviteUserIDs = req.body.inviteUserIDs; // comma separated list of user IDs to invite
-      if (inviteUserIDs==null || inviteUserIDs=='' || inviteUserIDs.length==0) {
+      console.log("POST /api/workrooms/:id/users "+req.params.id+" "+inviteUserNames);
+
+      var inviteUserNames = req.body.inviteUserNames; // comma separated list of user IDs to invite
+      if (inviteUserNames==null || inviteUserNames=='' || inviteUserNames.length==0) {
         // this is really a user asking to join, same as inviting herself... (hack...)
-        inviteUserIDs = [req.user._id];
+        inviteUserNames = [req.user.username];
         console.log("request to join "+req.params.id+" by user "+req.user);
       }
-      console.log("POST /api/workrooms/:id/users "+req.params.id+" "+inviteUserIDs);
-      console.log("info params = "+inviteUserIDs.length+" "+(typeof inviteUserIDs === 'string')+ " "+(typeof inviteUserIDs === 'array'));
 
       var room = Workroom.findById(req.params.id, function (err, room) {
         if (err) return console.log(err);
         console.log("found room: "+room.name+" users="+room.users);
-        inviteUserList = inviteUserIDs // inviteUserIDs.split(',');
-        console.log("adding to list of users: "+inviteUserList);
-        room.users = arrayUnique(room.users.concat(inviteUserList));
-        room.save();
-        console.log("Users in workroom: "+room.name+" are now: "+room.users.length+" "+room.users);
-        return res.send(room);
+        console.log("adding to list of users: "+inviteUserNames);
+
+        // Retrieve corresponding mongoDB IDs
+        User
+          .find({'username': { $in: inviteUserNames} })
+          .exec(function (err, inviteUsers) {
+            if (err) return console.log(err);
+
+            var inviteUserIDs = new Array();
+            console.log("found "+inviteUsers.length+" matching users");
+            for (var i=0; i<inviteUsers.length; i++)
+              inviteUserIDs.push(inviteUsers[i]._id);
+            room.users = arrayUnique(room.users.concat(inviteUserIDs));
+            console.log("found "+inviteUserIDs+" matching users to invite list of "+inviteUserNames);
+
+            // Post a message to the workroom about the new user(s) joining the room
+            for (var i=0; i<inviteUserNames.length; i++) {
+              var joinMessage = new JoinMessage(
+                {
+                  'html': "@" + inviteUserNames[i]+" has joined #"+room.name,
+                  'author': req.user._id,
+                  'author_name': req.user.username,
+                  'date': Date.now(),
+
+                  'roomName': room.name,
+                  'userName': inviteUserNames[i]
+                }
+              );
+              console.log("Posting to channel about user "+inviteUserNames[i]);
+              MessageController.addMessageToRoom(room, joinMessage);
+              console.log("Done posting to channel");
+            }
+            room.save();
+            console.log("Users in workroom: "+room.name+" are now: "+room.users.length+" "+room.users);
+
+
+            return res.send(room);
+          });
       });
     });
   };

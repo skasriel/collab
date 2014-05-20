@@ -27,12 +27,53 @@ workroomControllers.controller('CurrentUserCtrl', ['$scope', '$http',
     });
   }]);
 
+// Get information about current workroom
+// doesn't work: can't get routeParams since it's a different controller from the one displaying the screen. f'ed up angular
+/*
+workroomControllers.controller('CurrentWorkroomCtrl', ['$scope', '$routeParams', '$http',
+  function ($scope, $routeParams, $http) {
+    if (!$routeParams.workroomId) {
+      console.log('Not getting info about current workroom as there is not one');
+      $scope.active_workroom = null;
+      $scope.$parent.active_workroom = null;
+      return;
+    }
+    console.log('getting info about current workroom: '+$routeParams.workroomId);
+    $http.get('/api/workroom/'+$routeParams.workroomId).success(function(data) {
+      $scope.active_workroom = data;
+      $scope.$parent.active_workroom = data;
+      console.log(' active workroom: '+data);
+    })
+    .error(function(data, status) {
+      console.log("Get current workroom: "+status+" "+data.error);
+      if (!checkLogin(status)) return;
+    });
+  }]);
+  */
+
+// Get information about currently logged in user
+workroomControllers.controller('CurrentUserCtrl', ['$scope', '$http',
+  function ($scope, $http) {
+    console.log('getting active user');
+    $http.get('/api/user/my').success(function(data) {
+      $scope.active_user = data;
+      $scope.$parent.active_user = data;
+      console.log(' active user: '+data);
+    })
+    .error(function(data, status) {
+      console.log("Get current user list error: "+status+" "+data.error);
+      if (!checkLogin(status)) return;
+    });
+  }]);
+
+
+
 // Get list of all workrooms which logged in user is a member of
 workroomControllers.controller('WorkroomCtrl', ['$scope', '$http', '$window',
   function ($scope, $http, $window) {
     //$scope.workrooms = Workroom.query();
     console.log('getting workroom list');
-    $http.get('/api/my-workrooms').success(function(data) {
+    $http.get('/api/workrooms/my').success(function(data) {
       $scope.workrooms = data;
       //console.log(' workroom list: '+$scope.workrooms);
     })
@@ -45,16 +86,17 @@ workroomControllers.controller('WorkroomCtrl', ['$scope', '$http', '$window',
 
 
 // Get list of messages for a room
-workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', '$http', 'socket',
-  function($scope, $routeParams, $http, socket) {
+workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', '$http', '$sce', 'socket',
+  function($scope, $routeParams, $http, $sce, socket) {
     $scope.getMessageList = function() {
       $scope.workroomId = $routeParams.workroomId;
-      $scope.$parent.workroomId = $routeParams.workroomId; // to allow highlighting in left nav
+      if ($scope.$parent)
+        $scope.$parent.workroomId = $routeParams.workroomId; // to allow highlighting in left nav
       var url = '/api/workrooms/' + $routeParams.workroomId + "/messages";
       $http.get(url).success(function(data) {
         //console.log("messages data: "+data[0].name+" "+data.length);
         $scope.workroomName = data.shift().name; // first entry is room name
-        $scope.messages = data;
+        $scope.messages = formatMessages(data);
         //console.log("room name is: "+$scope.workroomName);
       })
       .error(function(data, status) {
@@ -62,6 +104,37 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
         if (!checkLogin(status)) return;
       });
     }
+
+
+    function formatMessages(messageList) {
+      for (var i=0; i<messageList.length; i++) {
+        var message = messageList[i];
+        message.html = formatMessage(message.html);
+        message.trustedHTML = $sce.trustAsHtml(message.html);
+      }
+      return messageList;
+    }
+    function formatMessage(html) {
+      var pos=0;
+      while(pos<html.length) {
+        pos=html.indexOf('@', pos);
+        if (pos<0) {
+          break;
+        }
+        var endMentionPos = html.indexOf(" ", pos);
+        if (endMentionPos<0) endMentionPos=html.length;
+        var user = html.substring(pos+1, endMentionPos);
+        var newContent = '<a href="#/profile/@' + user + '">@' + user + '</a>';
+        html = html.substring(0, pos)
+          + newContent
+          + html.substring(endMentionPos);
+        pos = endMentionPos + newContent.length - user.length;
+      }
+      console.log("returning: "+html);
+      return html;
+    }
+
+    // Listen to socket.io messages to decide whether to update the current view (because someone posted on this workroom)
     socket.on('send:message', function (data) {
       console.log("got websock "+data);
       console.log('got a message: '+data.user+" "+data.room+" "+data.message);
@@ -72,6 +145,8 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
       }
     });
     $scope.getMessageList();
+
+
   }]);
 
 // Add a message to a workroom
@@ -93,7 +168,7 @@ workroomControllers.controller('AddMessageController', ['$scope', '$routeParams'
 
       $scope.populateMentionBox = function() {
         $http.get('/api/users/').success(function(data) {
-          //console.log("user data: "+data+" "+data.length+" $scope="+$scope);
+          console.log("user data: "+data+" "+data.length+" $scope="+$scope);
           // Init the Mention.js
           var userData = [];
           for (var i=0; i<data.length; i++) {
@@ -137,7 +212,7 @@ workroomControllers.controller('AddWorkroomController', ['$scope', '$routeParams
 workroomControllers.controller('JoinWorkroomController', ['$scope', '$routeParams', '$http',
   function($scope, $routeParams, $http) {
       $scope.GetAllWorkrooms = function() {
-          var url = '/api/all-workrooms/';
+          var url = '/api/workrooms/all';
           $http.get(url)
           .success(function(data, status, headers, config) {
             $scope.all_workrooms = data;
@@ -179,7 +254,7 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
       $scope.inviteUsers = ['Loading'];
       $scope.InviteUser = function() {
         $http.post('/api/workrooms/'+$routeParams.workroomId+'/users',
-          {'inviteUserIDs': $scope.inviteUsers}
+          {'inviteUserNames': $scope.inviteUsers}
         ).success(function(data, status, headers, config) {
           /*console.log("old user list: "+$scope.users+" scope="+$scope);
           $scope.users.push($scope.inviteUsers);
@@ -204,9 +279,19 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
     }
   ]);
 
+  // Profile
+  workroomControllers.controller('UserProfileCtrl', ['$scope', '$routeParams', '$http',
+    function ($scope, $routeParams, $http) {
+      $http.get('/api/user/'+$routeParams.userName).success(function(data) {
+        $scope.user = data;
+        console.log("user data: "+data.username+" "+data.firstname+" "+data.lastname+" "+data.avatarURL);
+      });
+    }
+  ]);
+
   // User Settings
-  workroomControllers.controller('UserSettingsCtrl', ['$scope', '$routeParams', '$http', '$upload',
-    function ($scope, $routeParams, $http, $upload) {
+  workroomControllers.controller('UserSettingsCtrl', ['$scope', '$routeParams', '$http',
+    function ($scope, $routeParams, $http) {
       $http.get('/api/user/my').success(function(data) {
         $scope.user = data;
         /*username = data.username;

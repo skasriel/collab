@@ -60,7 +60,7 @@ module.exports = function(passport) {
             return done(err);
 
           if (user) {
-            console.log("Found user, ok: "+user.username+" "+user.displayname);
+            console.log("Found oDesk user, ok: "+user.username+" "+user.displayname);
             return done(null, user);
           } else {
             console.log("Creating user based on odesk info:"
@@ -102,75 +102,78 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
 
     },
-    function(req, token, refreshToken, profile, done) { // asynchronous
+    function(req, googleToken, refreshToken, profile, done) { // asynchronous
       process.nextTick(function() {
-        // check if the user is already logged in
-        if (!req.user) {
-          User.findOne({ 'google.id' : profile.id }, function(err, user) {
-              if (err)
-                return done(err);
-
-              if (user) {
-                  console.log("found google user: "+user);
-                  // if there is a user id already but no token (user was linked at one point and then removed)
-                  if (!user.google.token) {
-                    console.log("no google token: creating");
-                    user.google.token = token;
-                    user.google.name  = profile.displayName;
-                    user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                    // come up with a username and display name based on data returned by google
-                    user.username = user.google.email;
-                    user.displayname = user.google.name;
-
-                    user.save(function(err) {
-                        if (err)
-                            throw err;
-                        console.log("saved user: "+user);
-                        return done(null, user);
-                    });
-                  }
-                  return done(null, user);
-              } else {
-                console.log("existing google user with token");
-                var newUser          = new User();
-                newUser.google.id    = profile.id;
-                newUser.google.token = token;
-                newUser.google.name  = profile.displayName;
-                newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                // come up with a username and display name based on data returned by google
-                newUser.username = newUser.google.email;
-                newUser.displayname = newUser.google.name;
-
-                newUser.save(function(err) {
-                  if (err)
-                      throw err;
-                  console.log("saved user: "+newUser);
-                  return done(null, newUser);
-                });
-              }
-          });
-        } else {
-          // user already exists and is logged in, we have to link accounts
-          var user               = req.user; // pull the user out of the session
-          console.log("existing google user: "+user+" "+user.username+" "+user.displayname);
-
-          user.google.id    = profile.id;
-          user.google.token = token;
-          user.google.name  = profile.displayName;
-          user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-          // come up with a username and display name based on data returned by google
-          //user.username = user.google.email;
-          //user.displayname = user.google.name;
-
-          user.save(function(err) {
-              if (err)
-                  throw err;
-              return done(null, user);
-          });
+        console.log("Starting google strategy");
+        if (req.user) {
+          throw new Error("User is already logged in as: "+req.user.username);
         }
+
+        // check if the user is already logged in
+        User.findOne({ 'google.id' : profile.id }, function(err, user) {
+            if (err)
+              return done(err);
+
+            if (user) {
+              console.log("Found google user, ok: "+user.username+" "+user.displayname);
+              return done(null, user);
+              /*
+                console.log("found google user: "+user);
+                // if there is a user id already but no token (user was linked at one point and then removed)
+                if (!user.google.token) {
+                  console.log("no google token: creating");
+                  user.google.token = googleToken;
+                  user.google.name  = profile.displayName;
+                  user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+
+                  // come up with a username and display name based on data returned by google
+                  user.username = user.google.email;
+                  user.displayname = user.google.name;
+
+                  user.save(function(err) {
+                      if (err)
+                          throw err;
+                      console.log("saved user: "+user);
+                      return done(null, user);
+                  });
+                }*/
+            } else {
+              console.log("Creating user based on google info");
+              var newUser          = new User();
+              newUser.google.id    = profile.id;
+              newUser.google.token = googleToken;
+              newUser.google.name  = profile.displayName;
+              newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+
+              // come up with a username and display name based on data returned by google
+              newUser.username = newUser.google.email;
+              newUser.displayname = newUser.google.name;
+
+              newUser.save(function(err) {
+                if (err)
+                    throw err;
+                console.log("saved user: "+newUser);
+                return done(null, newUser);
+              });
+
+              // Pull google contact book!
+              var GoogleContacts = require('google-contacts').GoogleContacts;
+              var c = new GoogleContacts({
+                token: googleToken
+              });
+              c.on('error', function (e) {
+                console.log('error getting contacts from google', e);
+              });
+              c.on('contactsReceived', function (contacts) {
+                console.log('contacts: ' + contacts);
+              });
+              /*c.on('contactGroupsReceived', function (contactGroups) {
+                console.log('groups: ' + contactGroups);
+              });*/
+              c.getContacts('thin', 100);
+              //c.getContactGroups('thin', 200);
+            }
+        });
     });
   }));
 };
