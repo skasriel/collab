@@ -1,6 +1,6 @@
 //'use strict';
 
-var KanbanController = function ($scope, $modal, kanbanManipulator) {
+var KanbanController = function ($scope, $rootScope, $http, $modal, $routeParams, kanbanManipulator) {
     $scope.addNewCard = function(column) {
 		var modalInstance = $modal.open({
 			templateUrl: 'NewKanbanCard.html',
@@ -10,11 +10,33 @@ var KanbanController = function ($scope, $modal, kanbanManipulator) {
 				column: function(){ return column; }
 			}
 		});
-		modalInstance.result.then(function(cardDetails){
-		if (cardDetails){
-			kanbanManipulator.addCardToColumn($scope.kanban, cardDetails.column, cardDetails.title, cardDetails.details, cardDetails.color);
-			}
-		});
+
+    modalInstance.result.then(function(cardDetails) {
+      if (!cardDetails) return;
+      kanbanManipulator.addCardToColumn($scope.kanban, cardDetails.column, cardDetails.title, cardDetails.details, cardDetails.color);
+      // post a message to server about this (the actual saving of the board happens through the watcher, saving the entire board every time)
+
+      var url = '/api/workrooms/'+$routeParams.workroomId+'/messages';
+      alert("root2 = "+$rootScope);
+
+      var message = '@'+$rootScope.active_user.username+" created new task "+cardDetails.title;
+      alert("post "+message);
+      $http.post(url,
+        {
+          '_type': 'KanbanMessage',
+          'actor': $rootScope.active_user.username,
+          'action': 'new_card',
+
+          'html': message
+        }
+      )
+      .success(function(data, status, headers, config) {
+        console.log("Post message result: "+status+" - "+data.msg);
+      }).error(function(data, status) {
+        console.log("Post message error: "+status+" "+data.error);
+      });
+
+    });
 	};
 
 	$scope.delete = function(card, column){

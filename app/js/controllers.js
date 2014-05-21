@@ -12,20 +12,6 @@ var checkLogin = function(status) {
 }
 var workroomControllers = angular.module('workplaceControllers', []);
 
-// Get information about currently logged in user
-workroomControllers.controller('CurrentUserCtrl', ['$scope', '$http',
-  function ($scope, $http) {
-    console.log('getting active user');
-    $http.get('/api/user/my').success(function(data) {
-      $scope.active_user = data;
-      $scope.$parent.active_user = data;
-      console.log(' active user: '+data);
-    })
-    .error(function(data, status) {
-      console.log("Get current user list error: "+status+" "+data.error);
-      if (!checkLogin(status)) return;
-    });
-  }]);
 
 // Get information about current workroom
 // doesn't work: can't get routeParams since it's a different controller from the one displaying the screen. f'ed up angular
@@ -51,20 +37,22 @@ workroomControllers.controller('CurrentWorkroomCtrl', ['$scope', '$routeParams',
   }]);
   */
 
-// Get information about currently logged in user
-workroomControllers.controller('CurrentUserCtrl', ['$scope', '$http',
-  function ($scope, $http) {
-    console.log('getting active user');
-    $http.get('/api/user/my').success(function(data) {
-      $scope.active_user = data;
-      $scope.$parent.active_user = data;
-      console.log(' active user: '+data);
-    })
-    .error(function(data, status) {
-      console.log("Get current user list error: "+status+" "+data.error);
-      if (!checkLogin(status)) return;
-    });
-  }]);
+
+  // Get information about currently logged in user
+  workroomControllers.controller('CurrentUserCtrl', ['$scope', '$rootScope', '$http',
+    function ($scope, $rootScope, $http) {
+      console.log('getting active user');
+      $http.get('/api/user/my').success(function(data) {
+        $scope.active_user = data;
+        $scope.$parent.active_user = data;
+        $rootScope.active_user = data;
+        console.log(' active user: '+data);
+      })
+      .error(function(data, status) {
+        console.log("Get current user list error: "+status+" "+data.error);
+        if (!checkLogin(status)) return;
+      });
+    }]);
 
 
 
@@ -373,8 +361,6 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
 
 
   // <-------- Handling different events in this block ---------------> //
-  $scope.spinConfig = {lines: 10, length: 3, width: 2, radius:5};
-
 
   // load kanban from server
   var json;
@@ -401,7 +387,7 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
     console.log("Load error: "+status+" "+data.error);
   });
 
-  // watch for changes
+  // watch for changes and post them back to server
   $scope.$watch('kanban', function() {
     /*var prepared = angular.toJson($scope.kanban, false);
     console.log("saving "+prepared);
@@ -419,7 +405,7 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
     });
   }, true);
 
-  var windowHeight = angular.element($window).height() - 150;
+  var windowHeight = angular.element($window).height() - 250;
   $scope.minHeightOfColumn =  'min-height:'+windowHeight+'px;';
 
 }]);

@@ -17,7 +17,6 @@
     <div id="info" class="nav pull-right" ng-show="showInfo">
       <span id="error" class="error" ng-show="showError"><a ng-click="showInfo=false;showError=false;errorMessage=''">{{errorMessage}}</a></span>
       <span id="message" class="">{{infoMessage}}</span>
-      <span id="spinner" class="pull-right" spin="spinConfig" spin-if="showSpinner"></span>
     </div>
 
     <div class="container-fluid" id="kanban" ng-controller="KanbanController">

@@ -35,7 +35,7 @@ module.exports = function (app, io) {
   });
 
   // Save full kanban data
-  app.post('/api/workrooms/:workroomId/kanban'/*, IsAuthenticated*/, function (req, res) {
+  app.post('/api/workrooms/:workroomId/kanban', IsAuthenticated, function (req, res) {
     console.log("Saving full kanban for workroom"+req.params.workroomId);
     var room = Workroom.findById(req.params.workroomId)
     .exec(
