@@ -2,6 +2,9 @@
 
 # connect to mongo terminal
 
+# git
+git tag -a v1.4 -m 'my version 1.4'
+
 # github
 git clone https://github.com/skasriel/collab.git
 git push origin master

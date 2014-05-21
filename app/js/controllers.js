@@ -409,23 +409,17 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
 
     // Post full kanban back to server
     var url = '/api/workrooms/'+$routeParams.workroomId+'/kanban';
-    //console.log("post to: "+url+": "+prepared);
+    console.log("post to: "+url+": "+$scope.kanban);
 
     $http.post(url, $scope.kanban)
     .success(function(data, status, headers, config) {
-      console.log("Post message result: "+status+" - "+data.msg);
+      console.log("Post kanban is ok: "+status+" - "+data.msg);
     }).error(function(data, status) {
       console.log("Post message error: "+status+" "+data.error);
     });
   }, true);
 
-  var windowHeight = angular.element($window).height() - 110;
+  var windowHeight = angular.element($window).height() - 150;
   $scope.minHeightOfColumn =  'min-height:'+windowHeight+'px;';
-
-  $scope.triggerOpen = function() {
-    $scope.$broadcast('TriggerOpenKanban');
-    alert("trigger open");
-  };
-
 
 }]);
