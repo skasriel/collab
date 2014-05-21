@@ -357,3 +357,75 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
       });
     }
   ]);
+
+// Kanban
+workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '$routeParams', 'kanbanManipulator',
+  function ($scope, $http, $window, $routeParams, kanbanManipulator) {
+    $scope.workroomId = $routeParams.workroomId;
+    $scope.colorOptions = ['FFFFFF','DBDBDB','FFB5B5', 'FF9E9E', 'FCC7FC', 'FC9AFB', 'CCD0FC', '989FFA', 'CFFAFC', '9EFAFF', '94D6FF','C1F7C2', 'A2FCA3', 'FAFCD2', 'FAFFA1', 'FCE4D4', 'FCC19D'];
+    $scope.kanban = null;
+
+
+    $scope.openKanbanShortcut = function($event){
+      $scope.$broadcast('TriggerOpen');
+      alert("trigger open");
+    };
+
+
+  // <-------- Handling different events in this block ---------------> //
+  $scope.spinConfig = {lines: 10, length: 3, width: 2, radius:5};
+
+
+  // load kanban from server
+  var json;
+  /*json = localStorage.getItem('myPersonalKanban');
+  this.kanban =  angular.fromJson(localStorage.getItem('myPersonalKanban'));*/
+  var url = '/api/workrooms/'+$routeParams.workroomId+'/kanban';
+  console.log("load from: "+url);
+  $http.get(url)
+  .success(function(data, status, headers, config) {
+    if (data=='' || data.length==0) { // create a new kanban
+      console.log("creating new kanban");
+      $scope.kanban = new Kanban("kanban", 3);
+      var names = ["To Do", "In Progress", "Ready for Review"];
+      for (var i=0;i<3;i++) {
+        kanbanManipulator.addColumn($scope.kanban, names[i]);
+      }
+    } else {
+      var json = angular.toJson(data, true);
+      console.log("load result: "+json);
+      $scope.kanban = angular.fromJson(json);
+      console.log("kanban: "+$scope.kanban.name+" "+$scope.kanban.numberOfColumns+" "+$scope.kanban.columns[0].name);
+    }
+  }).error(function(data, status) {
+    console.log("Load error: "+status+" "+data.error);
+  });
+
+  // watch for changes
+  $scope.$watch('kanban', function() {
+    /*var prepared = angular.toJson($scope.kanban, false);
+    console.log("saving "+prepared);
+    localStorage.setItem('myPersonalKanban', prepared);*/
+
+    // Post full kanban back to server
+    var url = '/api/workrooms/'+$routeParams.workroomId+'/kanban';
+    //console.log("post to: "+url+": "+prepared);
+
+    $http.post(url, $scope.kanban)
+    .success(function(data, status, headers, config) {
+      console.log("Post message result: "+status+" - "+data.msg);
+    }).error(function(data, status) {
+      console.log("Post message error: "+status+" "+data.error);
+    });
+  }, true);
+
+  var windowHeight = angular.element($window).height() - 110;
+  $scope.minHeightOfColumn =  'min-height:'+windowHeight+'px;';
+
+  $scope.triggerOpen = function() {
+    $scope.$broadcast('TriggerOpenKanban');
+    alert("trigger open");
+  };
+
+
+}]);

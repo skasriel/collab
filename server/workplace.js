@@ -12,6 +12,7 @@ var application_root = __dirname,
 var User = require('./models/user');
 var Message = require('./models/message');
 var Workroom = require('./models/workroom');
+var Kanban = require('./models/kanban');
 
 
 // database
@@ -52,26 +53,6 @@ app.configure(function() {
   app.use(passport.session());
   app.use(app.router);
 });
-
-/*
-
-app.use(express.static(static_root));
-
-app.use(cookieParser('TEMP SECRET -- NOT FOR PROD'));
-app.use(require('body-parser'));
-app.use(require('express-session', { secret: 'Told you, this aint prod' }));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(require('method-override'));
-app.use(require('errorhandler', { dumpExceptions: true, showStack: true })); // makes the browser hang for some reason
-*/
-
-
-
-
-
 console.log("done configuring app");
 
 
@@ -165,6 +146,7 @@ require('./routes/auth')(app,io);
 require('./routes/user')(app,io);
 require('./routes/message')(app, io);
 require('./routes/workroom')(app, io);
+require('./routes/kanban')(app, io);
 
 
 var port = Number(process.env.PORT || 3000);

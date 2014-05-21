@@ -17,6 +17,8 @@
   <!-- Mention.js styles -->
 	<link rel="stylesheet" type="text/css" href="/Mention.js/recommended-styles.css">
 
+  <!-- Kanban styles -->
+  <link rel="stylesheet" href="/css/app.css">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
@@ -67,7 +69,7 @@
       <h5 class="sidebartitle">Channels</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
         <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query"><!-- | filter: {workroom.type: 'public'}">-->
-          <a href="#/workrooms/{{workroom._id}}">
+          <a href="#/workrooms/{{workroom._id}}/messages">
             <i class="fa fa-th-list"></i>
             <span>#{{workroom.name}}</span>
             <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
@@ -89,7 +91,7 @@
       <h5 class="sidebartitle">People</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
         <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {workroom.type: '1:1'}">
-          <a href="#/workrooms/{{workroom._id}}">
+          <a href="#/workrooms/{{workroom._id}}/messages">
             <i class="fa fa-th-list"></i>
             <span>#{{workroom.name}}</span>
             <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
@@ -722,6 +724,26 @@
 
 <script src="js/services.js"></script>
 <script src="/angular-resource/angular-resource.js"></script>
+
+<!-- for kanban -->
+<script src="/angular-ui-bootstrap-bower/ui-bootstrap.min.js"></script>
+<script src="/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js"></script>
+<script src="/jquery-ui/ui/jquery-ui.js"></script>
+
+<script src="/angular-ui-utils/ui-utils.min.js"></script>
+<script src="/spinjs/spin.js"></script>
+
+<script src="/kanban/app/scripts/model.js"></script>
+<script src="/kanban/app/scripts/services/KanbanServices.js"></script>
+
+<script src="/kanban/app/scripts/controllers/CardController.js"></script>
+<script src="/kanban/app/scripts/controllers/NewKanbanCardController.js"></script>
+<script src="/kanban/app/scripts/controllers/KanbanController.js"></script>
+
+<script src="/kanban/app/scripts/directives/KanbanDirectives.js"></script>
+<script src="/kanban/app/scripts/filters/KanbanFilters.js"></script>
+
+<!-- / end kanban -->
 
 <script src="/Mention.js/bootstrap-typeahead.js"></script>
 <script src="/Mention.js/mention.js"></script>
