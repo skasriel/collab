@@ -60,7 +60,7 @@ module.exports = function (app, io) {
             }
           }
           if (!isMember) {
-            var isAvailable = isSameRealm(room.team_refs, req.user.team_refs);
+            var isAvailable = app.isSameRealm(room.team_refs, req.user.team_refs);
             console.log("Is room "+room.name+" available to "+req.user.username+"? "+isAvailable);
             if (!isAvailable) // this room isn't accessible to this user, because they don't have any teams in common
               continue;
