@@ -40,12 +40,12 @@ module.exports = function (app, io) {
   // List workrooms this user has joined
   app.get('/api/workrooms/:listType', IsAuthenticated, function (req, res) {
     console.log("GET /api/workrooms/"+req.params.listType+". User is: "+req.user.username);
-    return Workroom
+    var roomList = new Array();
+    Workroom
       .find()
       .sort("name")
       .exec(function (err, workrooms) {
         if (err) return console.log(err);
-        var roomList = new Array();
         // inefficient, but works for now: return the subset of rooms that this user has joined
         for(i=0; i<workrooms.length; i++) {
           var room = workrooms[i];
@@ -78,7 +78,29 @@ module.exports = function (app, io) {
           }
         }
         console.log("returns: "+roomList.length+" allowed rooms from a total of "+workrooms.length);
-        return res.send(roomList);
+
+        // Now get the list of 1:1 rooms, i.e. all the users that the active user can communicate with
+        User.findOne({'username' : req.user.username}).exec(function (err, active_user) {
+          User.find()
+          .select('_id username displayname avatarURL team_refs')
+          .sort("displayname")
+          .exec(function (err, users) {
+            if (err) return console.log(err);
+            users.forEach(function(user) {
+              var isVisible = app.isSameRealm(user.team_refs, active_user.team_refs);
+              console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
+              if (isVisible) {
+                var roomObj = {
+                  "name": user.displayname,
+                  "_id": '???',
+                  "type": '1:1',
+                };
+                roomList.push(roomObj);
+              }
+            });
+            return res.send(roomList);
+          });
+        });
       });
   });
 

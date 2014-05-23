@@ -354,12 +354,6 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
     $scope.kanban = null;
 
 
-    $scope.openKanbanShortcut = function($event){
-      $scope.$broadcast('TriggerOpen');
-      alert("trigger open");
-    };
-
-
   // <-------- Handling different events in this block ---------------> //
 
   // load kanban from server

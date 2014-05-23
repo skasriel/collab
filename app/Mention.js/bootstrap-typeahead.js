@@ -60,13 +60,15 @@
         height: this.$element[0].offsetHeight
       })
       console.log("in bootstrap-typeahead... # entries: " +this.$menu.height()+" "+this.$menu.pos+" "+this.$menu);
+      var menuHeight = Math.min(this.$menu.height(), 10*34) + 15;
+      var topPos = pos.top - menuHeight ; //this.source.length * 30 // stephane's total hack...
       this.$menu
         .insertAfter(this.$element)
         .css({
-          top: pos.top - this.source.length * 30 // stephane's total hack...
+          top: topPos
         , left: pos.left
         })
-        .show()
+        .show();
 
       this.shown = true
       return this

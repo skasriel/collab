@@ -17,8 +17,8 @@ var KanbanController = function ($scope, $rootScope, $http, $modal, $routeParams
       // post a message to server about this (the actual saving of the board happens through the watcher, saving the entire board every time)
 
       var url = '/api/workrooms/'+$routeParams.workroomId+'/messages';
-      alert("root2 = "+$rootScope);
 
+      // Post a message to the message list. Unclear whether this should be done on the client side or server side...
       var message = '@'+$rootScope.active_user.username+" created new task "+cardDetails.title;
       alert("post "+message);
       $http.post(url,

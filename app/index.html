@@ -68,7 +68,7 @@
       <!-- CHANNELS -->
       <h5 class="sidebartitle">Channels</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query"><!-- | filter: {workroom.type: 'public'}">-->
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: 'public'}"><!-- | filter: {workroom.type: 'public'}">-->
           <a href="#/workrooms/{{workroom._id}}/messages">
             <i class="fa fa-th-list"></i>
             <span>#{{workroom.name}}</span>
@@ -90,10 +90,9 @@
       <!-- PEOPLE -->
       <h5 class="sidebartitle">People</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {workroom.type: '1:1'}">
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: '1:1'} | limitTo:25">
           <a href="#/workrooms/{{workroom._id}}/messages">
-            <i class="fa fa-th-list"></i>
-            <span>#{{workroom.name}}</span>
+            <span>@{{workroom.name}}</span>
             <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
           </a>
         </li>
@@ -101,7 +100,7 @@
       <!--<input ng-model="query" class="form-control" placeholder="Search people...">-->
       <br>
       <!-- Invite a person to join -->
-      <!--<a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Join existing #channel... </a>-->
+      <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Invite to #channel... </a>
 
     </div><!-- leftpanelinner -->
   </div><!-- leftpanel -->

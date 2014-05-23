@@ -128,10 +128,18 @@ Strategy.prototype.userProfile = function(token, tokenSecret, params, done) {
         //"company_url":data.info.company_url
       };
 
-
-
-
-      done(null, profile);
+      // Get additional oDesk info through this other URL... Would be easier if the public APIs gave everything in one place :)
+      me._oauth.get('https://www.odesk.com/api/auth/v1/info.json',
+        token, tokenSecret,
+        function (err, body, res) {
+          if (err) { return done(new InternalOAuthError('failed to fetch user profile', err)); }
+          var data = JSON.parse(body);
+          profile.img = data.info.portrait_100_img;
+          profile.location = data.info.location;
+          profile.country = data.info.location.country;
+          profile.company_url = data.info.company_url;
+          done(null, profile);
+        });
     });
 
 }
