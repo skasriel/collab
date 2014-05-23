@@ -11,7 +11,8 @@ var WorkroomSchema = new Schema({
   users:     [ {type: Schema.ObjectId, ref: 'UserSchema'} ],
   kanban:    {type: Schema.ObjectId, ref: 'KanbanSchema'},
   type:      {type: String, enum: ["public", "1:1", "private"], default: "public" },
-  modified:  {type: Date, default: Date.now }
+  modified:  {type: Date, default: Date.now },
+  team_refs: [Number]
 });
 
 WorkroomSchema.path('name').validate(function (v) {

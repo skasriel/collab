@@ -1,9 +1,10 @@
 /**
  * Module dependencies.
  */
-var util = require('util')
-  , OAuthStrategy = require('passport-oauth').OAuthStrategy
-  , InternalOAuthError = require('passport-oauth').InternalOAuthError;
+var util = require('util'),
+  OAuthStrategy = require('passport-oauth').OAuthStrategy,
+  InternalOAuthError = require('passport-oauth').InternalOAuthError,
+  request = require('superagent');
 
 
 /**
@@ -46,11 +47,8 @@ function Strategy(options, verify) {
   options.accessTokenURL = options.accessTokenURL || 'https://www.odesk.com/api/auth/v1/oauth/token/access';
   options.userAuthorizationURL = options.userAuthorizationURL || 'https://www.odesk.com/services/api/auth';
   options.sessionKey = options.sessionKey || 'oauth:twitter'; //strange, but without it works we have errors - Anatolij
-
   OAuthStrategy.call(this, options, verify);
   this.name = 'odesk';
-
-  this._skipExtendedUserProfile = (options.skipExtendedUserProfile === undefined) ? false : options.skipExtendedUserProfile;
 }
 
 /**
@@ -97,45 +95,45 @@ Strategy.prototype.authenticate = function(req, options) {
  * @api protected
  */
 Strategy.prototype.userProfile = function(token, tokenSecret, params, done) {
-  if (!this._skipExtendedUserProfile) {
-    this._oauth.get(
-      'https://www.odesk.com/api/auth/v1/info.json',
-      token, tokenSecret,
-      function (err, body, res) {
-        if (err) { return done(new InternalOAuthError('failed to fetch user profile', err)); }
+  var me = this;
+  this.token = token;
+  this.tokenSecret = tokenSecret;
 
-        try {
-          var data = JSON.parse(body);
+  this._oauth.get('https://www.odesk.com/api/hr/v2/users/me.json', //'https://www.odesk.com/api/auth/v1/info.json',
+    token, tokenSecret,
+    function (err, body, res) {
+      if (err) { return done(new InternalOAuthError('failed to fetch user profile', err)); }
+      var data = JSON.parse(body);
 
-          console.log("Got from oDesk: "+data.auth_user.mail+" and "+body);
+      console.log("Got from oDesk: "+data.email+" and "+body);
 
-          var profile = {
-              provider: 'odesk',
-              "id" :  data.auth_user.uid,
-              "name": {"familyName": data.auth_user.last_name, "givenName": data.auth_user.first_name},
-              ref : data.info.ref,
-              "displayName" : data.auth_user.first_name + " " + data.auth_user.last_name,
-              "img" : data.info.portrait_50_img,
-              "country" : data.info.location.country,
-              "profile" : data.info.profile_url,
-              "email": data.auth_user.mail, // always null, oDesk doesn't pass emails?
-              "emails":[{"value":data.auth_user.mail,type:"work"}], // always null, oDesk doesn't pass emails?
-              "timezone":data.auth_user.timezone,
-              "timezone_offset":data.auth_user.timezone_offset,
-              "location":data.info.location,
-              "company_url":data.info.company_url
-            };
-          done(null, profile);
-        } catch(e) {
-          done(e);
-        }
-      });
-  } else {
-    var profile = { provider: 'odesk' };
-    profile.id = params.id;
-    profile.displayName = params.displayName;
-    done(null, profile);
-  }
+      var profile = {
+        oauth: me._oauth,
+        token: me.token,
+        tokenSecret: me.tokenSecret,
+
+        provider: 'odesk',
+        "id" :  data.user.id,
+        "name": {"familyName": data.user.last_name, "givenName": data.user.first_name},
+        //ref : data.info.ref,
+        "displayName" : data.user.first_name + " " + data.user.last_name,
+        //"img" : data.info.portrait_100_img,
+        "profile" : data.user.public_url, //data.info.profile_url,
+        "email": data.user.email,
+        "timezone":data.user.timezone,
+        "timezone_offset":data.user.timezone_offset,
+        "teams": []
+        //"location":data.info.location,
+        //"country" : data.info.location.country,
+        //"company_url":data.info.company_url
+      };
+
+
+
+
+      done(null, profile);
+    });
+
 }
 
 /**

@@ -156,7 +156,7 @@ workroomControllers.controller('AddMessageController', ['$scope', '$routeParams'
 
       $scope.populateMentionBox = function() {
         $http.get('/api/users/').success(function(data) {
-          console.log("user data: "+data+" "+data.length+" $scope="+$scope);
+          console.log("# of users: "+data.length+" $scope="+$scope);
           // Init the Mention.js
           var userData = [];
           for (var i=0; i<data.length; i++) {
@@ -259,8 +259,8 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
       // get all users to display in the drop down
       $scope.getUserList = function() {
         $http.get('/api/users/').success(function(data) {
-          //console.log("user data: "+data+" "+data.length+" $scope="+$scope);
           $scope.users = data;
+          console.log("# of users: "+data.length+" $scope="+$scope);
         });
       }
       $scope.getUserList();

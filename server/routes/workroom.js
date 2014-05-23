@@ -13,6 +13,29 @@ module.exports = function (app, io) {
     }
   }
 
+  app._intersect = function(a, b) {
+    var d = {};
+    var results = [];
+    for (var i = 0; i < b.length; i++) {
+        d[b[i]] = true;
+    }
+    for (var j = 0; j < a.length; j++) {
+        if (d[a[j]])
+            results.push(a[j]);
+    }
+    return results;
+  }
+
+  app.isSameRealm = function(room_teams, user_teams) {
+    if (!room_teams) {
+      console.log("Workroom has no team info - not accessible to anyone!");
+      return false;
+    } else if (!user_teams) {
+      console.log("User has no team info - can't access any rooms!");
+      return false;
+    }
+    return app._intersect(room_teams, user_teams).length > 0;
+  }
 
   // List workrooms this user has joined
   app.get('/api/workrooms/:listType', IsAuthenticated, function (req, res) {
@@ -35,6 +58,12 @@ module.exports = function (app, io) {
               isMember=true;
               break;
             }
+          }
+          if (!isMember) {
+            var isAvailable = isSameRealm(room.team_refs, req.user.team_refs);
+            console.log("Is room "+room.name+" available to "+req.user.username+"? "+isAvailable);
+            if (!isAvailable) // this room isn't accessible to this user, because they don't have any teams in common
+              continue;
           }
           if (req.params.listType=='all' || isMember) {
             // add to list: either client requested all rooms, or if it requested "my" rooms, this one fits the bill
@@ -64,7 +93,8 @@ module.exports = function (app, io) {
         var workroom = new Workroom({
           name: req.body.name,
           messages: [],
-          users: [user]
+          users: [user],
+          team_refs: user.team_refs
         });
         workroom.save(function (err) {
           if (!err) {

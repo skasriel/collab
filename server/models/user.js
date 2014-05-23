@@ -14,6 +14,9 @@ var UserSchema = new Schema({
   twitterHandle: String,
   blurb: String,
 
+  team_refs: [Number],
+  teams: [{type: Schema.ObjectId, ref: 'TeamSchema'}],
+
   // username, password are handled by local passport
 
   // google credentials

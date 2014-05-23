@@ -19,18 +19,26 @@ module.exports = function (app, io) {
   }
 
 
-  // returns the list of all users
+  // returns the list of all users in the logged in user's realm
   app.get('/api/users', IsAuthenticated, function (req, res) {
     console.log("GET /api/users");
-    return User
-      .find()
-      .select('_id username displayname avatarURL')
+    User.findOne({'username' : req.user.username}).exec(function (err, active_user) {
+      User.find()
+      .select('_id username displayname avatarURL team_refs')
       .sort("displayname")
       .exec(function (err, users) {
         if (err) return console.log(err);
-        console.log("GET /api/users returns: "+users.length);
-        return res.send(users);
+        var visibleUsers = [];
+        users.forEach(function(user) {
+          var isVisible = app.isSameRealm(user.team_refs, active_user.team_refs);
+          console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
+          if (isVisible)
+            visibleUsers.push(user);
+        });
+        console.log("GET /api/users returns: "+visibleUsers.length+" visible users out of "+users.length+" total users");
+        return res.send(visibleUsers);
       });
+    });
   });
 
   // returns information about a specific user
