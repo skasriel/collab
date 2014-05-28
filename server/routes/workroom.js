@@ -26,6 +26,10 @@ module.exports = function (app, io) {
     return results;
   }
 
+  /**
+  Whether two users are in the same realm, based on whether they have at least one team in common
+  (Should be a service)
+  */
   app.isSameRealm = function(room_teams, user_teams) {
     if (!room_teams) {
       console.log("Workroom has no team info - not accessible to anyone!");
@@ -37,7 +41,25 @@ module.exports = function (app, io) {
     return app._intersect(room_teams, user_teams).length > 0;
   }
 
-  // List workrooms this user has joined
+  /**
+   1:1 rooms are called @<user1>-<user2>, sorted alphabetically to ensure that there is no <user2>-<user1>
+   */
+
+  app.getOneOneRoomName = function(username1, username2) {
+    var smaller, larger;
+    if (username1 < username2) {
+      smaller = username1;
+      larger = username2;
+    } else {
+      larger = username1;
+      smaller = username2;
+    }
+    return '@'+smaller+'-'+larger;
+  }
+
+  /**
+   List workrooms this user has joined
+   */
   app.get('/api/workrooms/:listType', IsAuthenticated, function (req, res) {
     console.log("GET /api/workrooms/"+req.params.listType+". User is: "+req.user.username);
     var roomList = new Array();
@@ -88,11 +110,12 @@ module.exports = function (app, io) {
             if (err) return console.log(err);
             users.forEach(function(user) {
               var isVisible = app.isSameRealm(user.team_refs, active_user.team_refs);
-              console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
+              //console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
               if (isVisible) {
+                var roomName = app.getOneOneRoomName(user.username, active_user.username);
                 var roomObj = {
                   "name": user.displayname,
-                  "_id": '???',
+                  "_id": roomName,
                   "type": '1:1',
                 };
                 roomList.push(roomObj);
@@ -104,11 +127,12 @@ module.exports = function (app, io) {
       });
   });
 
-  // Add a new workroom
-  PostToWorkroom = function(io) {
+  /**
+  Create a new workroom
+  */
+  CreateNewWorkroom = function(io) {
     return function (req, res) {
-      console.log("POST /api/workrooms. User is: "+req.user);
-      console.log(req.body);
+      console.log("POST /api/workrooms. User is: "+req.user+" body="+req.body);
 
       var user = User.findById(req.user, function(err, user) {
         if (err) return console.log(err);
@@ -129,6 +153,6 @@ module.exports = function (app, io) {
       });
     }
   };
-  app.post('/api/workrooms', IsAuthenticated, PostToWorkroom(io));
+  app.post('/api/workrooms', IsAuthenticated, CreateNewWorkroom(io));
 
 }

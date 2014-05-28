@@ -17,11 +17,16 @@ module.exports = function (app, io) {
       room.messages.push(message);
       room.save();
 
+      var roomID = room._id;
+      if (room.name.charAt(0)=='@') {
+        // 1:1 room, identified not by _id but by @<user1>-<user2>
+        roomID = room.name;
+      }
       // notify websockets so all logged in users refresh their messages
-      // TODO: note that this isn't secure at all: should only send contents to users who are part of this room
+      // TODO: this isn't secure: should only send contents to users who are part of this room
       io.sockets.emit('send:message', {
         user: message.author_name,
-        room: room._id,
+        room: roomID,
         message: message.html
       });
 
@@ -47,17 +52,36 @@ module.exports = function (app, io) {
     }
   };
 
-  // Get messages for a room
+  /** Returns a mongoose promise that can be exec()
+  */
+  app.getRoomByNameOrId = function(name) {
+    console.log("Name="+name+" instanceof="+(name instanceof String)+" typeof="+(typeof name));
+    if ((typeof name == 'string' || name instanceof String) && name.charAt(0)=='@') {
+      console.log("Finding 1:1 room: "+name);
+      // this is a 1:1 room, which may not have been created yet since they are created upon the first message being sent
+      return Workroom.findOne({'name': name});
+    } else {
+      return Workroom.findById(name);
+    }
+  }
+
+  /**
+  * Get messages for a workroom
+  */
   app.get('/api/workrooms/:id/messages', IsAuthenticated, function (req, res) {
     console.log("in /api/workrooms/:id/messages "+req.params.id);
-    var room = Workroom.findById(req.params.id, function (err, workroom) {
+    var room = app.getRoomByNameOrId(req.params.id);
+    room.exec(function (err, workroom) {
       if (err) return console.log(err);
+      if (!workroom) {
+        // 1:1 room, hasn't been created yet and that's fine
+        return res.send("");
+      }
       console.log("looking up message(s) for workroom: "+workroom.name);
       var messages = Message
         .find({'_id': { $in: workroom.messages} })
         .populate('author', 'displayname avatarURL')
-        .exec(
-        function (err, messages) {
+        .exec(function (err, messages) {
           if (err) return console.log(err);
           // return additional params (e.g. room name) before returning message list
           var roomname = new additionalParams();
@@ -67,31 +91,43 @@ module.exports = function (app, io) {
           return res.send(messages);
         });
     });
-    return room;
   });
 
 
 
-  // Post a message to a workroom
+  /**
+  Post a message to a workroom
+  */
   app.post('/api/workrooms/:id/messages', IsAuthenticated, function (req, res) {
 
     console.log("POST /api/workrooms/:id/messages "+req.params.id);
-    var room = Workroom.findById(req.params.id, function (err, workroom) {
+    var now = Date.now();
+    var message = new Message(
+      {
+        'html': req.body.html,
+        'author': req.user._id,
+        'author_name': req.user.username,
+        'date': now
+      }
+    );
+
+    var room = app.getRoomByNameOrId(req.params.id);
+    console.log("posting to room: "+req.params.id);
+    room.exec(function (err, workroom) {
       if (err) return console.log(err);
-      var now = Date.now();
-      var message = new Message(
-        {
-          'html': req.body.html,
-          'author': req.user._id,
-          'author_name': req.user.username,
-          'date': now
-        }
-      );
+      if (!workroom) {
+        // This only happens for 1:1 rooms since they're not created in advance, create it now
+        workroom = new Workroom({
+          'name': req.params.id, // something like "@<user1>-<user2>"
+          'messages':  [],
+          'users':     [], //req.user.username], // should add the other user too, does it matter?
+          'type':      '1:1',
+          'team_refs': [] // does this matter?
+        });
+        console.log("creating new 1:1 workroom: "+workroom.name);
+      }
       console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
       addMessageToRoom(workroom, message);
-
-
-      console.log("Posted: "+message);
       return res.send(message);
     });
   });

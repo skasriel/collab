@@ -68,9 +68,9 @@
       <!-- CHANNELS -->
       <h5 class="sidebartitle">Channels</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: 'public'}"><!-- | filter: {workroom.type: 'public'}">-->
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: 'public'} | limitTo:10"><!-- | filter: {workroom.type: 'public'}">-->
           <a href="#/workrooms/{{workroom._id}}/messages">
-            <i class="fa fa-th-list"></i>
+            <!--<i class="fa fa-th-list"></i>-->
             <span>#{{workroom.name}}</span>
             <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
           </a>
@@ -90,7 +90,7 @@
       <!-- PEOPLE -->
       <h5 class="sidebartitle">People</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: '1:1'} | limitTo:25">
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: '1:1'} | limitTo:10">
           <a href="#/workrooms/{{workroom._id}}/messages">
             <span>@{{workroom.name}}</span>
             <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
@@ -647,7 +647,7 @@
             </div>
             <ul class="list-unstyled">
               <div class="form-group form-inline">
-                <li ng-repeat="workroom in all_workrooms | filter:all_query">
+                <li ng-repeat="workroom in all_workrooms | filter:all_query | filter: {type: 'public'}">
                   <span class="col-md-9">
                     #{{workroom.name}}
                   </span>

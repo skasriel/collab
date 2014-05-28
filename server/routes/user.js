@@ -31,7 +31,7 @@ module.exports = function (app, io) {
         var visibleUsers = [];
         users.forEach(function(user) {
           var isVisible = app.isSameRealm(user.team_refs, active_user.team_refs);
-          console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
+          //console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
           if (isVisible)
             visibleUsers.push(user);
         });

@@ -18,14 +18,6 @@ module.exports = function(passport) {
     passport.use(new LocalStrategy(User.authenticate()));
     passport.serializeUser(User.serializeUser());
     passport.deserializeUser(User.deserializeUser());
-    /*passport.deserializeUser(function(id, done) {
-      User.findOne({'username' : id})
-      //.select('_id username firstname lastname displayname avatarURL userLocation mobilePhone twitterHandle blurb')
-      //.populate('companyRoles._company', ['name', '_id'])
-      .exec(function (err, user) {
-          done(err, user);
-        });
-    });*/
 
     function buildUserNameFromOdeskProfile(profile) {
       if (profile.id)

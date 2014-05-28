@@ -73,6 +73,36 @@ workroomControllers.controller('WorkroomCtrl', ['$scope', '$http', '$window',
 
 
 
+function formatMessages(messageList, $sce) {
+  for (var i=0; i<messageList.length; i++) {
+    var message = messageList[i];
+    message.html = formatMessage(message.html, $sce);
+    message.trustedHTML = $sce.trustAsHtml(message.html); // not secure!
+  }
+  return messageList;
+}
+function formatMessage(html, $sce) {
+  var pos=0;
+  while(pos<html.length) {
+    pos=html.indexOf('@', pos);
+    if (pos<0) {
+      break;
+    }
+    var endMentionPos = html.indexOf(" ", pos);
+    if (endMentionPos<0) endMentionPos=html.length;
+    var user = html.substring(pos+1, endMentionPos);
+    var newContent = '<a href="#/profile/@' + user + '">@' + user + '</a>';
+    html = html.substring(0, pos)
+      + newContent
+      + html.substring(endMentionPos);
+    pos = endMentionPos + newContent.length - user.length;
+  }
+  console.log("returning: "+html);
+  return html;
+}
+
+
+
 // Get list of messages for a room
 workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', '$http', '$sce', 'socket',
   function($scope, $routeParams, $http, $sce, socket) {
@@ -82,9 +112,16 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
         $scope.$parent.workroomId = $routeParams.workroomId; // to allow highlighting in left nav
       var url = '/api/workrooms/' + $routeParams.workroomId + "/messages";
       $http.get(url).success(function(data) {
+        if (!data) {
+          // empty workroom - typically only happens for 1:1 rooms that haven't yet been created;
+          $scope.messages = [];
+          return;
+        }
         //console.log("messages data: "+data[0].name+" "+data.length);
-        $scope.workroomName = data.shift().name; // first entry is room name
-        $scope.messages = formatMessages(data);
+        var name = data.shift().name; // first entry is room name
+        if (name.charAt(0)!='@') name = '#'+ name; // display channels with a leading '#'
+        $scope.workroomName = name;
+        $scope.messages = formatMessages(data, $sce);
         //console.log("room name is: "+$scope.workroomName);
       })
       .error(function(data, status) {
@@ -93,34 +130,6 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
       });
     }
 
-
-    function formatMessages(messageList) {
-      for (var i=0; i<messageList.length; i++) {
-        var message = messageList[i];
-        message.html = formatMessage(message.html);
-        message.trustedHTML = $sce.trustAsHtml(message.html);
-      }
-      return messageList;
-    }
-    function formatMessage(html) {
-      var pos=0;
-      while(pos<html.length) {
-        pos=html.indexOf('@', pos);
-        if (pos<0) {
-          break;
-        }
-        var endMentionPos = html.indexOf(" ", pos);
-        if (endMentionPos<0) endMentionPos=html.length;
-        var user = html.substring(pos+1, endMentionPos);
-        var newContent = '<a href="#/profile/@' + user + '">@' + user + '</a>';
-        html = html.substring(0, pos)
-          + newContent
-          + html.substring(endMentionPos);
-        pos = endMentionPos + newContent.length - user.length;
-      }
-      console.log("returning: "+html);
-      return html;
-    }
 
     // Listen to socket.io messages to decide whether to update the current view (because someone posted on this workroom)
     socket.on('send:message', function (data) {
@@ -138,17 +147,19 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
   }]);
 
 // Add a message to a workroom
-workroomControllers.controller('AddMessageController', ['$scope', '$routeParams', '$http', 'socket',
-    function($scope, $routeParams, $http, socket) {
+workroomControllers.controller('AddMessageController', ['$scope', '$routeParams', '$http', 'socket', '$sce',
+    function($scope, $routeParams, $http, socket, $sce) {
       $scope.PostMessage = function() {
           var url = '/api/workrooms/'+$routeParams.workroomId+'/messages';
           //console.log("post to: "+url);
           $http.post(url, {'html': $scope.message})
           .success(function(data, status, headers, config) {
+            data.html = formatMessage(data.html, $sce);
+            data.trustedHTML = $sce.trustAsHtml(data.html);
             $scope.messages.push(data);
             $scope.message='';
-            //console.log("Post message result: "+status+" - "+data.msg);
-            //console.log("Post message error: "+data.error);
+            console.log("Post message result: "+status+" - "+JSON.stringify(data));
+            console.log("Post message error: "+data.error);
           }).error(function(data, status) {
             console.log("Post message error: "+status+" "+data.error);
           });
@@ -267,7 +278,12 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
     }
   ]);
 
-  // Profile
+
+
+
+  /**
+   Profile
+   */
   workroomControllers.controller('UserProfileCtrl', ['$scope', '$routeParams', '$http',
     function ($scope, $routeParams, $http) {
       $http.get('/api/user/'+$routeParams.userName).success(function(data) {
@@ -277,7 +293,9 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
     }
   ]);
 
-  // User Settings
+  /**
+   User Settings
+   */
   workroomControllers.controller('UserSettingsCtrl', ['$scope', '$routeParams', '$http',
     function ($scope, $routeParams, $http) {
       $http.get('/api/user/my').success(function(data) {
@@ -346,7 +364,11 @@ workroomControllers.controller('InviteUserController', ['$scope', '$routeParams'
     }
   ]);
 
-// Kanban
+
+
+/**
+ Kanban
+ */
 workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '$routeParams', 'kanbanManipulator',
   function ($scope, $http, $window, $routeParams, kanbanManipulator) {
     $scope.workroomId = $routeParams.workroomId;
