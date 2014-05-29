@@ -1,10 +1,12 @@
 <div class="pageheader">
   <h2>
     <i class="fa fa-home"></i> {{workroomName}}
-    <span>Messages</span>
-    <span><a href="#/workrooms/{{workroomId}}/users"> Users</a></span>
-    <span><a href="#/workrooms/{{workroomId}}/kanban"> Tasks</a></span>
-    <span><a href="#/workrooms/{{workroomId}}/files"> Files</a></span>
+    <span ng-if="workroomId.charAt(0)!='@'">
+      Messages
+      <span><a href="#/workrooms/{{workroomId}}/users"> Users</a></span>
+      <span><a href="#/workrooms/{{workroomId}}/kanban"> Tasks</a></span>
+      <span><a href="#/workrooms/{{workroomId}}/files"> Files</a></span>
+    </span>
   </h2>
 </div>
 
@@ -17,7 +19,7 @@
         <div ng-include src="message_template"></div> <!-- show either the NoMessage or the Messages templates -->
 
         <script type="text/ng-template" id="NoMessages.html">
-          No messages in this channel. Post the first message in the box below. 
+          No messages in this channel. Post the first message in the box below.
         </script>
 
 

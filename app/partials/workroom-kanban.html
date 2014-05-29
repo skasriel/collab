@@ -11,8 +11,7 @@
 
 <div class="contentpanel">
 
-  <div ng-controller="KanbanAppCtrl"
-            ui-keyup="{'ctrl-shift-79':'openKanbanShortcut($event)'}">
+  <div ng-controller="KanbanAppCtrl" ui-keyup="{'ctrl-shift-79':'openKanbanShortcut($event)'}">
 
     <div id="info" class="nav pull-right" ng-show="showInfo">
       <span id="error" class="error" ng-show="showError"><a ng-click="showInfo=false;showError=false;errorMessage=''">{{errorMessage}}</a></span>
@@ -25,7 +24,7 @@
                 <div class="col-md-{{12/kanban.numberOfColumns}}" ng-repeat="column in kanban.columns" data-columnindex="{{$index}}" id="column{{$index}}">
                     <div class="column">
                       <div class="columnHeader">
-                          <a title="Add card to column" class="pull-right" ng-click="addNewCard(column)"><i class="glyphicon glyphicon-plus"></i></a>
+                          <a title="Add card to column" class="pull-right" ng-click="addKanbanCard(column)"><i class="glyphicon glyphicon-plus"></i></a>
                           <a title="Change column name" ng-click="editing = true" ng-model="column" ng-hide="editing"><i class="glyphicon glyphicon-tasks"></i></a>
                           <span ng-hide="editing">{{column.name}} ({{column.cards.length}})</span>
                           <form ng-show="editing" ng-submit="editing = false">
@@ -47,84 +46,94 @@
         </div>
 
         <section id="kanbanOperations">
-                <!-- Add a new card -->
-                <script type="text/ng-template" id="NewKanbanCard.html">
-                  <form ng-submit="addNewCard()" class="noMargin" name="newCardForm">
-                      <div class="modal-header">
-                        <button type="button" class="close" ng-click="close()">&times;</button>
-                        <h4 class="modal-title" ng-model="kanbanColumnName">New card for column '{{kanbanColumnName}}'</h4>
-                      </div>
-                      <div class="modal-body">
-                            <div class="form-group">
-                                <label class="control-label" for="newCardTitle">Kanban card title</label>
-                                <div>
-                                  <input type="text" id="newCardTitle" placeholder="Title on a card" ng-model="title" required focus-me class="cardInputs form-control"/>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="newCardDetails">More details <small>(optional)</small></label>
-                                <div>
-                                    <textarea id="newCardDetails" ng-model="details" class="cardInputs form-control" rows="7" >
-                                    </textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Card color</label>
-                            </div>
-                            <div class="form-group">
-                                <color-selector options="colorOptions" ng-model="cardColor" prefix="newCardColor" class="colorSelector" show-hex-code="true"/>
-                            </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" ng-click="close()">Close</button>
-                        <button type="submit" class="btn btn-primary">Add</button>
-                      </div>
-                  </form>
+            <!-- Add a new card -->
+            <script type="text/ng-template" id="NewKanbanCard.html">
+              <form ng-submit="addKanbanCard()" class="noMargin" name="newCardForm">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="close()">&times;</button>
+                  <h4 class="modal-title" ng-model="kanbanColumnName">New card for column '{{kanbanColumnName}}'</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="control-label" for="newCardTitle">Task name</label>
+                    <div>
+                      <input type="text" id="newCardTitle" placeholder="Task name" ng-model="title" required focus-me class="cardInputs form-control" style="width:500px"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="newCardAssignee">Task assignee (optional)</label>
+                    <div>
+                      <select ui-select2 ng-model="assignee" id="assignee" style="width:500px">
+                        <option ng-repeat="user in allUsers" value="{{user.username}}">{{user.displayname}} ({{user.username}})</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="newCardDetails">More details (optional)</label>
+                    <div>
+                      <textarea id="newCardDetails" ng-model="details" class="cardInputs form-control" rows="7" style="width:500px">
+                      </textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label">Card color</label>
+                  </div>
+                  <div class="form-group">
+                    <color-selector options="colorOptions" ng-model="cardColor" prefix="newCardColor" class="colorSelector" show-hex-code="true"/>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" ng-click="close()">Close</button>
+                  <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+              </form>
             </script>
+
             <script type="text/ng-template" id="OpenCard.html">
-                  <!-- View / edit a card -->
-                  <form ng-submit="update()" class="noMargin" name="cardDetails">
-                      <div class="modal-header">
-                        <button type="button" class="close" ng-click="close()">&times;</button>
-                        <h4 class="modal-title">Card details</h4>
+              <!-- View / edit a card -->
+              <form ng-submit="updateKanbanCard()" class="noMargin" name="cardDetails">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="close()">&times;</button>
+                  <h4 class="modal-title">Card details</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="control-label" for="cardTitle">Task name</label>
+                    <div class="controls">
+                      <ng-form>
+                      <div>
+                        <input name="cardTitle" type="text" id="cardTitle" placeholder="Task name" ng-model="name" required class="cardInputs" focus-me />
+                      </ng-form>
                       </div>
-                      <div class="modal-body">
-                            <div class="form-group">
-                                <label class="control-label" for="cardTitle">Kanban card title</label>
-                                <div class="controls">
-                                  <ng-form ng-submit="editingTitle = false">
-                                  <div>
-                                    <input name="cardTitle" type="text" id="cardTitle" placeholder="Title on a card" ng-model="name" required class="cardInputs" ng-disabled="!editingTitle" focus-me />
-                                    <a title="Edit card title" ng-click="editingTitle = true" ng-hide="editingTitle" class="btn pull-right"><i class="glyphicon glyphicon-pencil"></i></a>
-                                    <a title="OK" ng-click="editingTitle = false" ng-hide="!editingTitle" class="btn pull-right"><i class="glyphicon glyphicon-ok"></i></a>
-                                  </ng-form>
-                                  </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="cardTitle">Details</label>
-
-                                <div class="controls clearfix">
-                                    <textarea id="details" ng-model="details" class="cardInputs" rows="7" ng-show="editDetails">
-                                    </textarea>
-                                    <div class="cardDetails cardInputs pull-left" ng-show="!editDetails" ng-bind-html="details|linky|cardDetails"></div>
-
-                                    <a title="Edit card title" ng-click="editDetails = true" ng-hide="editDetails" class="btn pull-right"><i class="glyphicon glyphicon-pencil"></i></a>
-                                    <a title="OK" ng-click="editDetails = false" ng-hide="!editDetails" class="btn pull-right"><i class="glyphicon glyphicon-ok"></i></a>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Card color</label>
-                            </div>
-                            <div class="form-group">
-                                <color-selector options="colorOptions" ng-model="cardColor" prefix="editCardColor" class="colorSelector" show-hex-code="true" />
-                            </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" ng-click="close()">Close</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
-                      </div>
-                  </form>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="newCardAssignee">Task assignee (optional)</label>
+                    <div>
+                      <select ui-select2 ng-model="assignee" id="assignee" style="width:500px">
+                        <option ng-repeat="user in allUsers" value="{{user.username}}">{{user.displayname}} ({{user.username}})</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label" for="cardTitle">Details</label>
+                    <div class="controls clearfix">
+                      <textarea id="details" ng-model="details" class="cardInputs" rows="7">
+                      </textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label">Card color</label>
+                  </div>
+                  <div class="form-group">
+                    <color-selector options="colorOptions" ng-model="cardColor" prefix="editCardColor" class="colorSelector" show-hex-code="true" />
+                  </div>
+              </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" ng-click="close()">Close</button>
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+              </form>
             </script>
         </section>
     </div>

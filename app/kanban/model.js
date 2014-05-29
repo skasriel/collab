@@ -4,11 +4,6 @@ function Kanban(name, numberOfColumns) {
 	this.numberOfColumns = numberOfColumns;
 	this.columns = [];
 	console.log("created kanban: "+name+" "+numberOfColumns);
-	/*return {
-		name: name,
-		numberOfColumns: numberOfColumns,
-		columns: []
-	};*/
 }
 
 function KanbanColumn(name){
@@ -18,10 +13,11 @@ function KanbanColumn(name){
 	};
 }
 
-function KanbanCard(name, details, color) {
+function KanbanCard(name, details, color, assignee) {
 	this.name = name;
 	this.details = details;
 	this.color = color;
-	console.log("created card: "+name+" "+details+" "+color);
+	this.assignee = assignee;
+	console.log("created card: "+name+" "+details+" "+color+" assignee: "+assignee);
 	return this;
 }

@@ -1,6 +1,7 @@
 'use strict';
 
-var NewKanbanCardController = function ($scope, $routeParams, $modalInstance, kanbanManipulator, colorOptions, column) {
+// Create a new card
+var NewKanbanCardController = function ($scope, $http, $rootScope, $routeParams, $modalInstance, kanbanManipulator, colorOptions, column) {
 	function initScope(scope, colorOptions) {
 		scope.kanbanColumnName = column.name;
 		scope.column = column;
@@ -8,13 +9,25 @@ var NewKanbanCardController = function ($scope, $routeParams, $modalInstance, ka
 		scope.details = '';
 		scope.cardColor = colorOptions[0];
 		scope.colorOptions = colorOptions;
+		$http.get('/api/users/').success(function(data) {
+			scope.allUsers = data;
+			console.log("Getting user list for new kanban card modal: # of users: "+data.length+" $scope="+$scope);
+		});
 	}
 
-	$scope.addNewCard = function(){
+
+	$scope.addKanbanCard = function() {
 		if (!this.newCardForm.$valid){
 			return false;
 		}
-		$modalInstance.close({title: this.title, column: column, details: this.details, color: this.cardColor});
+		console.log("invited = "+this.assignee); //JSON.stringify(this.inviteUsers)+" "+this.InviteUserController);
+		$modalInstance.close({ // calls the then() of KanbanController
+			title: this.title,
+			column: column,
+			details: this.details,
+			color: this.cardColor,
+			assignee: this.assignee
+		});
 
 		/*var url = '/api/workrooms/'+$routeParams.workroomId+'/kanban/card';
 		console.log("post to: "+url);

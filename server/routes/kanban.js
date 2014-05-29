@@ -37,13 +37,11 @@ module.exports = function (app, io) {
   // Save full kanban data
   app.post('/api/workrooms/:workroomId/kanban', IsAuthenticated, function (req, res) {
     console.log("Saving full kanban for workroom"+req.params.workroomId);
-    var room = Workroom.findById(req.params.workroomId)
-    .exec(
+    var room = Workroom.findById(req.params.workroomId).exec(
       function (err, room) {
         if (err) return console.log(err);
         var kanbanID = room.kanban;
-        Kanban.findByIdAndUpdate(kanbanID, req.body, null,
-        function(err, kanban) {
+        Kanban.findByIdAndUpdate(kanbanID, req.body, null, function(err, kanban) {
           if (err) return console.log(err);
           if (kanban==null) {
             // creating kanban
@@ -54,7 +52,7 @@ module.exports = function (app, io) {
             room.save();
             console.log("added new kanban to room");
           }
-          console.log("saving kanban "+kanban.name+" in room "+room.name);
+          console.log("saving kanban "+kanban.name+" in room "+room.name+" as "+JSON.stringify(kanban));
           kanban.save();
           return res.send(kanban);
         });

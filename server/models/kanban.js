@@ -26,7 +26,8 @@ function KanbanCard(name, details, color){
 var KanbanCardSchema = new Schema({
   name:     {type: String, required: true, trim: true},
   details:  {type: String, required: false, trim: true},
-  color:    {type: String, required: true, trim: true}
+  color:    {type: String, required: true, trim: true},
+  assignee: {type: String}//{type: Schema.ObjectId, ref: 'UserSchema'}
 });
 module.exports.KanbanCard = mongoose.model('KanbanCard', KanbanCardSchema);
 module.exports.KanbanCardSchema = KanbanCardSchema;

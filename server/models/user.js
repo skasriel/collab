@@ -17,6 +17,8 @@ var UserSchema = new Schema({
   team_refs: [Number],
   teams: [{type: Schema.ObjectId, ref: 'TeamSchema'}],
 
+  read_messages: [{type: Schema.ObjectId, ref: 'MessageSchema'}],
+
   // username, password are handled by local passport
 
   // google credentials
@@ -31,7 +33,6 @@ var UserSchema = new Schema({
   odesk           : {
     token        : String,
   }
-
 
 });
 

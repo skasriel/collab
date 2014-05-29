@@ -411,8 +411,7 @@ workroomControllers.controller('KanbanAppCtrl', ['$scope', '$http', '$window', '
   this.kanban =  angular.fromJson(localStorage.getItem('myPersonalKanban'));*/
   var url = '/api/workrooms/'+$routeParams.workroomId+'/kanban';
   console.log("load from: "+url);
-  $http.get(url)
-  .success(function(data, status, headers, config) {
+  $http.get(url).success(function(data, status, headers, config) {
     if (data=='' || data.length==0) { // create a new kanban
       console.log("creating new kanban");
       $scope.kanban = new Kanban("kanban", 3);
