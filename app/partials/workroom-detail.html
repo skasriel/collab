@@ -13,21 +13,31 @@
   <div class="col-sm-6 col-md-8">
     <div class="panel panel-default panel-alt widget-messaging">
       <div class="panel-body">
-        <ul class="list-unstyled">
-          <li ng-repeat="message in messages" class="new">
 
-            <div class="media">
-              <a href="#" class="pull-left">
-                <img ng-src="{{message.author.avatarURL || 'http://ds.oregonstate.edu/files/images/empty.png'}}" height="50" class="media-object">
-              </a>
-              <div class="media-body">
-                  <small class="media-meta pull-right">{{message.date | date : 'h:mm a'}}</small>
-                  <h4 class="sender">{{message.author.displayname}}</h4>
-                  <small ng-bind-html="message.trustedHTML"></small> <!-- security risk: not filtering HTML at all -->
+        <div ng-include src="message_template"></div> <!-- show either the NoMessage or the Messages templates -->
+
+        <script type="text/ng-template" id="NoMessages.html">
+          No messages in this channel. Post the first message in the box below. 
+        </script>
+
+
+        <script type="text/ng-template" id="Messages.html">
+          <ul class="list-unstyled">
+            <li ng-repeat="message in messages" class="new">
+
+              <div class="media">
+                <a href="#" class="pull-left">
+                  <img ng-src="{{message.author.avatarURL || 'http://ds.oregonstate.edu/files/images/empty.png'}}" height="50" class="media-object">
+                </a>
+                <div class="media-body">
+                    <small class="media-meta pull-right">{{message.date | date : 'h:mm a'}}</small>
+                    <h4 class="sender">{{message.author.displayname}}</h4>
+                    <small ng-bind-html="message.trustedHTML"></small> <!-- security risk: not filtering HTML at all -->
+                </div>
               </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </script>
       </div><!-- panel-body -->
     </div><!-- panel -->
   </div><!-- col-sm-6 -->

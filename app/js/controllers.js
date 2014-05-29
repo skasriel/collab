@@ -63,7 +63,7 @@ workroomControllers.controller('WorkroomCtrl', ['$scope', '$http', '$window',
     console.log('getting workroom list');
     $http.get('/api/workrooms/my').success(function(data) {
       $scope.workrooms = data;
-      //console.log(' workroom list: '+$scope.workrooms);
+      //console.log(' workroom list: '+JSON.stringify($scope.workrooms));
     })
     .error(function(data, status) {
       console.log("Workroom list error: "+status+" "+data.error);
@@ -104,8 +104,8 @@ function formatMessage(html, $sce) {
 
 
 // Get list of messages for a room
-workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', '$http', '$sce', 'socket',
-  function($scope, $routeParams, $http, $sce, socket) {
+workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$rootScope', '$routeParams', '$http', '$sce', 'socket',
+  function($scope, $rootScope, $routeParams, $http, $sce, socket) {
     $scope.getMessageList = function() {
       $scope.workroomId = $routeParams.workroomId;
       if ($scope.$parent)
@@ -115,12 +115,16 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$routeParams', 
         if (!data) {
           // empty workroom - typically only happens for 1:1 rooms that haven't yet been created;
           $scope.messages = [];
+          $rootScope.workroomName = '';
+          $scope.message_template = 'NoMessages.html'; // display the template for "no messages in this workroom"
           return;
         }
+        $scope.message_template = "Messages.html"; // display the template for the message list
         //console.log("messages data: "+data[0].name+" "+data.length);
         var name = data.shift().name; // first entry is room name
         if (name.charAt(0)!='@') name = '#'+ name; // display channels with a leading '#'
         $scope.workroomName = name;
+        $rootScope.workroomName = name;
         $scope.messages = formatMessages(data, $sce);
         //console.log("room name is: "+$scope.workroomName);
       })
@@ -215,7 +219,7 @@ workroomControllers.controller('JoinWorkroomController', ['$scope', '$routeParam
           $http.get(url)
           .success(function(data, status, headers, config) {
             $scope.all_workrooms = data;
-            console.log("Get all workrooms result: "+status+" - "+data);
+            console.log("Get all workrooms result: "+status);
           }).error(function(data, status) {
             console.log("Get all workroom error: "+status+" "+data.error);
           });
@@ -247,11 +251,34 @@ workroomControllers.controller('WorkroomUsersCtrl', ['$scope', '$routeParams', '
     $scope.workroomId = $routeParams.workroomId;
 }]);
 
+workroomControllers.getOneOneRoomName = function(username1, username2) {
+    var smaller, larger;
+    if (username1 < username2) {
+      smaller = username1;
+      larger = username2;
+    } else {
+      larger = username1;
+      smaller = username2;
+    }
+    return '@'+smaller+'-'+larger;
+  }
+
 // Add a user to a room
-workroomControllers.controller('InviteUserController', ['$scope', '$routeParams', '$http', '$window',
-    function($scope, $routeParams, $http, $window) {
+workroomControllers.controller('InviteUserController', ['$scope', '$rootScope', '$routeParams', '$http', '$window',
+    function($scope, $rootScope, $routeParams, $http, $window) {
       $scope.inviteUsers = ['Loading'];
+
+      $scope.SelectUser = function() {
+        if (!$scope.inviteUsers) return;
+        var user1 = $rootScope.active_user.username;
+        var user2 = $scope.inviteUsers;
+        var roomName = workroomControllers.getOneOneRoomName(user1, user2);
+        $window.location = '#/workrooms/'+roomName+'/messages';
+        // Used by the "All People" modal to go to a specific 1:1 room
+        $('#AllPeopleModal').modal('hide');
+      }
       $scope.InviteUser = function() {
+        // Used by the "Invite User" modal to invite a user to a specific room
         $http.post('/api/workrooms/'+$routeParams.workroomId+'/users',
           {'inviteUserNames': $scope.inviteUsers}
         ).success(function(data, status, headers, config) {

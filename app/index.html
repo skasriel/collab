@@ -68,11 +68,11 @@
       <!-- CHANNELS -->
       <h5 class="sidebartitle">Channels</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: 'public'} | limitTo:10"><!-- | filter: {workroom.type: 'public'}">-->
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: 'public'} | limitTo:8"><!-- | filter: {workroom.type: 'public'}">-->
           <a href="#/workrooms/{{workroom._id}}/messages">
             <!--<i class="fa fa-th-list"></i>-->
             <span>#{{workroom.name}}</span>
-            <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
+            <span ng-if="workroom.numMessages>0" class="badge pull-right">{{workroom.numMessages}}</span>
           </a>
         </li>
       </ul>
@@ -86,523 +86,64 @@
 
 
 
-
+      <br><br>
       <!-- PEOPLE -->
       <h5 class="sidebartitle">People</h5>
       <ul class="nav nav-pills nav-stacked nav-bracket">
-        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: '1:1'} | limitTo:10">
+        <li class="{{ (workroom._id == workroomId) ?'active':''}}" ng-repeat="workroom in workrooms | filter:query | filter: {type: '1:1'} | limitTo:5">
           <a href="#/workrooms/{{workroom._id}}/messages">
             <span>@{{workroom.name}}</span>
-            <span ng-if="workroom.messages.length>0" class="badge pull-right">{{workroom.messages.length}}</span>
+            <span ng-if="workroom.numMessages>0" class="badge pull-right">{{workroom.numMessages}}</span>
           </a>
         </li>
       </ul>
       <!--<input ng-model="query" class="form-control" placeholder="Search people...">-->
       <br>
+      <a ng-href="#" data-toggle="modal" data-target="#AllPeopleModal">+ All People...</a><br>
       <!-- Invite a person to join -->
       <a ng-href="#" data-toggle="modal" data-target="#JoinWorkroomModal"> + Invite to #channel... </a>
 
     </div><!-- leftpanelinner -->
   </div><!-- leftpanel -->
 
+
+
   <div class="mainpanel">
-
-    <div class="headerbar">
-
-      <a class="menutoggle"><i class="fa fa-bars"></i></a>
-
-      <form class="searchform" action="index.html" method="post">
-        <input type="text" class="form-control" name="keyword" placeholder="Search here..." />
-      </form>
-
-      <div class="header-right">
-        <ul class="headermenu">
-          <li>
-            <div class="btn-group">
-              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
-                <i class="glyphicon glyphicon-user"></i>
-                <span class="badge">2</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-head pull-right">
-                <h5 class="title">2 Newly Registered Users</h5>
-                <ul class="dropdown-list user-list">
-                  <li class="new">
-                    <div class="thumb"><a href=""><img src="images/photos/user1.png" alt="" /></a></div>
-                    <div class="desc">
-                      <h5><a href="">Draniem Daamul (@draniem)</a> <span class="badge badge-success">new</span></h5>
-                    </div>
-                  </li>
-                  <li class="new">
-                    <div class="thumb"><a href=""><img src="images/photos/user2.png" alt="" /></a></div>
-                    <div class="desc">
-                      <h5><a href="">Zaham Sindilmaca (@zaham)</a> <span class="badge badge-success">new</span></h5>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="thumb"><a href=""><img src="images/photos/user3.png" alt="" /></a></div>
-                    <div class="desc">
-                      <h5><a href="">Weno Carasbong (@wenocar)</a></h5>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="thumb"><a href=""><img src="images/photos/user4.png" alt="" /></a></div>
-                    <div class="desc">
-                      <h5><a href="">Nusja Nawancali (@nusja)</a></h5>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="thumb"><a href=""><img src="images/photos/user5.png" alt="" /></a></div>
-                    <div class="desc">
-                      <h5><a href="">Lane Kitmari (@lane_kitmare)</a></h5>
-                    </div>
-                  </li>
-                  <li class="new"><a href="">See All Users</a></li>
-                </ul>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="btn-group">
-              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
-                <i class="glyphicon glyphicon-envelope"></i>
-                <span class="badge">1</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-head pull-right">
-                <h5 class="title">You Have 1 New Message</h5>
-                <ul class="dropdown-list gen-list">
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user1.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Draniem Daamul <span class="badge badge-success">new</span></span>
-                      <span class="msg">Lorem ipsum dolor sit amet...</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user2.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Nusja Nawancali</span>
-                      <span class="msg">Lorem ipsum dolor sit amet...</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Weno Carasbong</span>
-                      <span class="msg">Lorem ipsum dolor sit amet...</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user4.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Zaham Sindilmaca</span>
-                      <span class="msg">Lorem ipsum dolor sit amet...</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user5.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Veno Leongal</span>
-                      <span class="msg">Lorem ipsum dolor sit amet...</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new"><a href="">Read All Messages</a></li>
-                </ul>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="btn-group">
-              <button class="btn btn-default dropdown-toggle tp-icon" data-toggle="dropdown">
-                <i class="glyphicon glyphicon-globe"></i>
-                <span class="badge">5</span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-head pull-right">
-                <h5 class="title">You Have 5 New Notifications</h5>
-                <ul class="dropdown-list gen-list">
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user4.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Zaham Sindilmaca <span class="badge badge-success">new</span></span>
-                      <span class="msg">is now following you</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user5.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Weno Carasbong <span class="badge badge-success">new</span></span>
-                      <span class="msg">is now following you</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Veno Leongal <span class="badge badge-success">new</span></span>
-                      <span class="msg">likes your recent status</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Nusja Nawancali <span class="badge badge-success">new</span></span>
-                      <span class="msg">downloaded your work</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new">
-                    <a href="">
-                    <span class="thumb"><img src="images/photos/user3.png" alt="" /></span>
-                    <span class="desc">
-                      <span class="name">Nusja Nawancali <span class="badge badge-success">new</span></span>
-                      <span class="msg">send you 2 messages</span>
-                    </span>
-                    </a>
-                  </li>
-                  <li class="new"><a href="">See All Notifications</a></li>
-                </ul>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                <img ng-src="{{active_user.avatarURL}}"  /> <!--"images/photos/loggeduser.png"-->
-                <span class="text-muted">
-                  {{active_user.username}}
-                </span>
-                <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-usermenu pull-right">
-                <li><a href="#/profile/@{{active_user.username}}"><i class="glyphicon glyphicon-user"></i> My Profile</a></li>
-                <li><a href="#/user-settings/@{{active_user.username}}"><i class="glyphicon glyphicon-cog"></i> Account Settings</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-question-sign"></i> Help</a></li>
-                <li><a href="/api/logout"><i class="glyphicon glyphicon-log-out"></i> Log Out</a></li>
-              </ul>
-            </div>
-          </li>
-          <li>
-            <button id="chatview" class="btn btn-default tp-icon chat-icon">
-                <i class="glyphicon glyphicon-comment"></i>
-            </button>
-          </li>
-        </ul>
-      </div><!-- header-right -->
-
-    </div><!-- headerbar -->
-
-
+    <div ng-include="'partials/top-nav.html'"></div>
     <!-- angular loads partials here -->
     <div ng-view></div>
-
-
   </div><!-- mainpanel -->
 
-  <div class="rightpanel">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs nav-justified">
-        <li class="active"><a href="#rp-alluser" data-toggle="tab"><i class="fa fa-users"></i></a></li>
-        <li><a href="#rp-favorites" data-toggle="tab"><i class="fa fa-heart"></i></a></li>
-        <li><a href="#rp-history" data-toggle="tab"><i class="fa fa-clock-o"></i></a></li>
-        <li><a href="#rp-settings" data-toggle="tab"><i class="fa fa-gear"></i></a></li>
-    </ul>
+  <div ng-include="'partials/right-nav.html'"></div>
 
-    <!-- Tab panes -->
-    <div class="tab-content">
-        <div class="tab-pane active" id="rp-alluser">
-            <h5 class="sidebartitle">Online Users</h5>
-            <ul class="chatuserlist">
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/userprofile.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Eileen Sideways</strong>
-                            <small>Los Angeles, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user1.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <span class="pull-right badge badge-danger">2</span>
-                            <strong>Zaham Sindilmaca</strong>
-                            <small>San Francisco, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user2.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Nusja Nawancali</strong>
-                            <small>Bangkok, Thailand</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user3.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Renov Leongal</strong>
-                            <small>Cebu City, Philippines</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user4.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Weno Carasbong</strong>
-                            <small>Tokyo, Japan</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-            </ul>
-
-            <div class="mb30"></div>
-
-            <h5 class="sidebartitle">Offline Users</h5>
-            <ul class="chatuserlist">
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user5.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Eileen Sideways</strong>
-                            <small>Los Angeles, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user2.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Zaham Sindilmaca</strong>
-                            <small>San Francisco, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user3.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Nusja Nawancali</strong>
-                            <small>Bangkok, Thailand</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user4.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Renov Leongal</strong>
-                            <small>Cebu City, Philippines</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user5.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Weno Carasbong</strong>
-                            <small>Tokyo, Japan</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user4.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Renov Leongal</strong>
-                            <small>Cebu City, Philippines</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user5.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Weno Carasbong</strong>
-                            <small>Tokyo, Japan</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-            </ul>
-        </div>
-        <div class="tab-pane" id="rp-favorites">
-            <h5 class="sidebartitle">Favorites</h5>
-            <ul class="chatuserlist">
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user2.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Eileen Sideways</strong>
-                            <small>Los Angeles, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user1.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Zaham Sindilmaca</strong>
-                            <small>San Francisco, CA</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user3.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Nusja Nawancali</strong>
-                            <small>Bangkok, Thailand</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user4.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Renov Leongal</strong>
-                            <small>Cebu City, Philippines</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user5.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Weno Carasbong</strong>
-                            <small>Tokyo, Japan</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-            </ul>
-        </div>
-        <div class="tab-pane" id="rp-history">
-            <h5 class="sidebartitle">History</h5>
-            <ul class="chatuserlist">
-                <li class="online">
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user4.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Eileen Sideways</strong>
-                            <small>Hi hello, ctc?... would you mind if I go to your...</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user2.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Zaham Sindilmaca</strong>
-                            <small>This is to inform you that your product that we...</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-                <li>
-                    <div class="media">
-                        <a href="#" class="pull-left media-thumb">
-                            <img alt="" src="images/photos/user3.png" class="media-object">
-                        </a>
-                        <div class="media-body">
-                            <strong>Nusja Nawancali</strong>
-                            <small>Are you willing to have a long term relat...</small>
-                        </div>
-                    </div><!-- media -->
-                </li>
-            </ul>
-        </div>
-        <div class="tab-pane pane-settings" id="rp-settings">
-
-            <h5 class="sidebartitle mb20">Settings</h5>
-            <div class="form-group">
-                <label class="col-xs-8 control-label">Show Offline Users</label>
-                <div class="col-xs-4 control-label">
-                    <div class="toggle toggle-success"></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-xs-8 control-label">Enable History</label>
-                <div class="col-xs-4 control-label">
-                    <div class="toggle toggle-success"></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-xs-8 control-label">Show Full Name</label>
-                <div class="col-xs-4 control-label">
-                    <div class="toggle-chat1 toggle-success"></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-xs-8 control-label">Show Location</label>
-                <div class="col-xs-4 control-label">
-                    <div class="toggle toggle-success"></div>
-                </div>
-            </div>
-
-        </div><!-- tab-pane -->
-
-    </div><!-- tab-content -->
-  </div><!-- rightpanel -->
 
 </section>
+
+<!-- MODALS BELOW -->
+
+<!-- View all people (not just the N shown on the left nav) -->
+
+<div class="modal fade" id="AllPeopleModal" tabindex="-1" role="dialog" aria-labelledby="AllPeopleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form ng-controller="InviteUserController" class="form-inline" role="form">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="AllPeopleModalLabel">1:1 Message</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <select ui-select2 ng-model="inviteUsers" ng-change="SelectUser()" id="inviteUsers" style="width:500px">
+                <option>Find by name...</option>
+                <option ng-repeat="user in users" value="{{user.username}}">{{user.displayname}} ({{user.username}})</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Create new workroom modal -->
 <div class="modal fade" id="AddWorkroomModal" tabindex="-1" role="dialog" aria-labelledby="AddWorkroomModalLabel" aria-hidden="true">

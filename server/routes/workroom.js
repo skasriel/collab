@@ -28,6 +28,7 @@ module.exports = function (app, io) {
 
   /**
   Whether two users are in the same realm, based on whether they have at least one team in common
+  This is anything but scalable, will need to think about a better data model at some point...
   (Should be a service)
   */
   app.isSameRealm = function(room_teams, user_teams) {
@@ -41,10 +42,10 @@ module.exports = function (app, io) {
     return app._intersect(room_teams, user_teams).length > 0;
   }
 
+
   /**
    1:1 rooms are called @<user1>-<user2>, sorted alphabetically to ensure that there is no <user2>-<user1>
    */
-
   app.getOneOneRoomName = function(username1, username2) {
     var smaller, larger;
     if (username1 < username2) {
@@ -58,11 +59,13 @@ module.exports = function (app, io) {
   }
 
   /**
-   List workrooms this user has joined
+   List workrooms this user has joined or list all rooms available to this user (same realm)
+   :listType is either "all" or "my"
    */
   app.get('/api/workrooms/:listType', IsAuthenticated, function (req, res) {
     console.log("GET /api/workrooms/"+req.params.listType+". User is: "+req.user.username);
     var roomList = new Array();
+    var roomSet = {};
     Workroom
       .find()
       .sort("name")
@@ -89,14 +92,31 @@ module.exports = function (app, io) {
           }
           if (req.params.listType=='all' || isMember) {
             // add to list: either client requested all rooms, or if it requested "my" rooms, this one fits the bill
+            var roomName, roomID;
+            if (room.type=='1:1') {
+              roomID = room.name;
+              var user1 = room.displayname1;
+              var user2 = room.displayname2;
+              if (req.user.displayname == user1)
+                roomName = user2;
+              else
+                roomName = user1;
+            } else {
+              roomName = room.name;
+              roomID = room._id;
+            }
             var roomObj = {
-              "name": room.name,
-              "_id": room._id,
+              "name": roomName,
+              "_id": roomID,
               "type": room.type,
               "modified": room.modified,
+              "numMessages": room.messages.length,
               "member": (isMember?"yes":"no")
             };
+            roomSet[room._id]=true;
             roomList.push(roomObj);
+
+            console.log("sending room: "+JSON.stringify(roomObj));
           }
         }
         console.log("returns: "+roomList.length+" allowed rooms from a total of "+workrooms.length);
@@ -113,12 +133,16 @@ module.exports = function (app, io) {
               //console.log("Is user "+user.username+" "+user.team_refs+" in same realm as "+active_user.username+" "+active_user.team_refs+"? "+isVisible);
               if (isVisible) {
                 var roomName = app.getOneOneRoomName(user.username, active_user.username);
-                var roomObj = {
-                  "name": user.displayname,
-                  "_id": roomName,
-                  "type": '1:1',
-                };
-                roomList.push(roomObj);
+                if (!roomSet[roomName]) {
+                  // This room doesn't exist yet, otherwise it would have been added to the roomSet. Send it in the list so users can start the conversation
+                  var roomObj = {
+                    "name": user.displayname,
+                    "_id": roomName,
+                    "numMessages": 0,
+                    "type": '1:1',
+                  };
+                  roomList.push(roomObj);
+                }
               }
             });
             return res.send(roomList);

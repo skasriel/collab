@@ -111,24 +111,36 @@ module.exports = function (app, io) {
       }
     );
 
-    var room = app.getRoomByNameOrId(req.params.id);
+    var roomPromise = app.getRoomByNameOrId(req.params.id);
     console.log("posting to room: "+req.params.id);
-    room.exec(function (err, workroom) {
+    roomPromise.exec(function (err, workroom) {
       if (err) return console.log(err);
       if (!workroom) {
         // This only happens for 1:1 rooms since they're not created in advance, create it now
-        workroom = new Workroom({
-          'name': req.params.id, // something like "@<user1>-<user2>"
-          'messages':  [],
-          'users':     [], //req.user.username], // should add the other user too, does it matter?
-          'type':      '1:1',
-          'team_refs': [] // does this matter?
+        var roomName = req.params.id;
+        var sepPos = roomName.indexOf('-');
+        var user1 = roomName.substring(1, sepPos);
+        var user2 = roomName.substring(sepPos+1);
+        console.log("Users for "+req.params.id+" are "+user1+" "+user2);
+        User.find({'username': { $in: [user1, user2] }}).exec(function(err, users) {
+          workroom = new Workroom({
+            'name': req.params.id,
+            'displayname1': users[0].displayname,
+            'displayname2': users[1].displayname,
+            'messages':  [],
+            'users':     [users[0], users[1]], //req.user.username], // should add the other user too, does it matter?
+            'type':      '1:1',
+            'team_refs': [] // does this matter?
+          });
+          console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
+          addMessageToRoom(workroom, message);
+          return res.send(message);
         });
-        console.log("creating new 1:1 workroom: "+workroom.name);
+      } else {
+        console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
+        addMessageToRoom(workroom, message);
+        return res.send(message);
       }
-      console.log("current messages for: "+workroom.name+" has "+workroom.messages.length);
-      addMessageToRoom(workroom, message);
-      return res.send(message);
     });
   });
 

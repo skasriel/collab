@@ -20,7 +20,6 @@ var KanbanController = function ($scope, $rootScope, $http, $modal, $routeParams
 
       // Post a message to the message list. Unclear whether this should be done on the client side or server side...
       var message = '@'+$rootScope.active_user.username+" created new task "+cardDetails.title;
-      alert("post "+message);
       $http.post(url,
         {
           '_type': 'KanbanMessage',
@@ -29,8 +28,7 @@ var KanbanController = function ($scope, $rootScope, $http, $modal, $routeParams
 
           'html': message
         }
-      )
-      .success(function(data, status, headers, config) {
+      ).success(function(data, status, headers, config) {
         console.log("Post message result: "+status+" - "+data.msg);
       }).error(function(data, status) {
         console.log("Post message error: "+status+" "+data.error);

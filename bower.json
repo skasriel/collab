@@ -27,6 +27,7 @@
     "jquery-ui": "~1.10.4",
     "angular-ui-utils": "~0.1.1",
     "spinjs": "~2.0.1",
-    "angular-ui-bootstrap-bower": "~0.11.0"
+    "angular-ui-bootstrap-bower": "~0.11.0",
+    "strophe": "~1.1.3"
   }
 }
