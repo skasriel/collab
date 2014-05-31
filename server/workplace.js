@@ -27,7 +27,7 @@ var mongoURL = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb:/
 console.log("Connecting to MongoDB on "+mongoURL);
 mongoose.connect(mongoURL);
 
-require('./passport-config')(passport); // pass passport for configuration
+require('./passport-config').passport(passport); // pass passport for configuration
 
 // config
 var app = express();

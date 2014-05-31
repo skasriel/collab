@@ -44,7 +44,7 @@ module.exports = function (app, io) {
 
 
   /**
-   1:1 rooms are called @<user1>-<user2>, sorted alphabetically to ensure that there is no <user2>-<user1>
+   1:1 rooms are called @<user1>|<user2>, sorted alphabetically to ensure that there is no <user2>|<user1>
    */
   app.getOneOneRoomName = function(username1, username2) {
     var smaller, larger;
@@ -55,7 +55,7 @@ module.exports = function (app, io) {
       larger = username1;
       smaller = username2;
     }
-    return '@'+smaller+'-'+larger;
+    return '@'+smaller+'|'+larger;
   }
 
   /**

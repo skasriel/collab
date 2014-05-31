@@ -12,7 +12,7 @@ var User = require('./models/user');
 // load the auth variables
 var configAuth = require('./config/auth');
 
-module.exports = function(passport) {
+module.exports.passport = function(passport) {
 
     // Regular username/password (boring)
     passport.use(new LocalStrategy(User.authenticate()));
@@ -123,7 +123,10 @@ module.exports = function(passport) {
       });
     }
 
-    passport.use(/*var ODCStrategy = */new oDeskStrategy({
+    /**
+    Add the oDesk Passport Strategy and its next() function
+    */
+    var strat = new oDeskStrategy({
       consumerKey: configAuth.oDeskAuth.clientID,
       consumerSecret: configAuth.oDeskAuth.clientSecret,
       callbackURL: configAuth.oDeskAuth.callbackURL
@@ -131,6 +134,14 @@ module.exports = function(passport) {
     function(req, token, tokenSecret, profile, done) { // verification callback from passport
       console.log("verifying oDesk signin: "+profile.id+" "+profile.name.givenName+" "+profile.name.familyName);
       process.nextTick(function () {
+
+        // make the oauth info available for controllers who need to call the oDesk APIs (e.g. to send invitations via message center)   
+        var me = strat;
+        me.profile = profile;
+        me.oauth = profile.oauth;
+        me.token = profile.token;
+        me.tokenSecret = profile.tokenSecret;
+
         if (req.user)
           throw new Error("User is already logged in");
         User.findOne({ 'username' : buildUserNameFromOdeskProfile(profile) },
@@ -172,13 +183,15 @@ module.exports = function(passport) {
               var teamData = JSON.parse(body);
               var teamInfo = teamData.teamrooms.teamroom;
               //wait.launchFiber(buildTeamArrayData, profile, newUser, teamInfo);
+              // Now go get the list of all users for each team, one at a time (serially, not in parallel)
               buildTeamArrayData(profile, newUser, teamInfo, 0);
             });
 
-            });
-        });
-    }));
-
+          });
+      });
+    });
+    passport.use(strat);
+    module.exports.oDeskStrategy = strat;
 
 
     // =========================================================================

@@ -34,9 +34,9 @@ module.exports = function (app, io) {
   var addMessageToRoom = module.exports.addMessageToRoom;
 
   function IsAuthenticated(req,res,next) {
-    if(req.isAuthenticated()){
+    if(req.isAuthenticated()) {
         next();
-    }else{
+    }else {
       console.log("Not authorized "+req);
         next(new Error(401));
     }
@@ -55,11 +55,10 @@ module.exports = function (app, io) {
   /** Returns a mongoose promise that can be exec()
   */
   app.getRoomByNameOrId = function(name) {
-    console.log("Name="+name+" instanceof="+(name instanceof String)+" typeof="+(typeof name));
     if ((typeof name == 'string' || name instanceof String) && name.charAt(0)=='@') {
       console.log("Finding 1:1 room: "+name);
       // this is a 1:1 room, which may not have been created yet since they are created upon the first message being sent
-      return Workroom.findOne({'name': name});
+      return Workroom.findOne({'name': name}); //name: name
     } else {
       return Workroom.findById(name);
     }
@@ -118,17 +117,18 @@ module.exports = function (app, io) {
       if (!workroom) {
         // This only happens for 1:1 rooms since they're not created in advance, create it now
         var roomName = req.params.id;
-        var sepPos = roomName.indexOf('-');
+        var sepPos = roomName.indexOf('|');
         var user1 = roomName.substring(1, sepPos);
         var user2 = roomName.substring(sepPos+1);
         console.log("Users for "+req.params.id+" are "+user1+" "+user2);
         User.find({'username': { $in: [user1, user2] }}).exec(function(err, users) {
           workroom = new Workroom({
+            //'_id': req.params.id, // custom mongo _id: <user1>|<user2>
             'name': req.params.id,
             'displayname1': users[0].displayname,
             'displayname2': users[1].displayname,
             'messages':  [],
-            'users':     [users[0], users[1]], //req.user.username], // should add the other user too, does it matter?
+            'users':     [users[0], users[1]],
             'type':      '1:1',
             'team_refs': [] // does this matter?
           });

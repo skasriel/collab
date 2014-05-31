@@ -49,6 +49,7 @@ function Strategy(options, verify) {
   options.sessionKey = options.sessionKey || 'oauth:twitter'; //strange, but without it works we have errors - Anatolij
   OAuthStrategy.call(this, options, verify);
   this.name = 'odesk';
+  console.log("Created oDesk Strategy: "+this);
 }
 
 /**

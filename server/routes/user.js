@@ -5,6 +5,7 @@ var MessageModule = require('../models/message'),
 var Workroom = require('../models/workroom');
 var User = require('../models/user');
 var MessageController = require("./message");
+var strategy = require('../passport-config').oDeskStrategy;
 
 
 module.exports = function (app, io) {
@@ -133,6 +134,18 @@ module.exports = function (app, io) {
         // this is really a user asking to join, same as inviting herself... (hack...)
         inviteUserNames = [req.user.username];
         console.log("request to join "+req.params.id+" by user "+req.user);
+      } else {
+        // send an MC message
+        var postBody = {
+          "recipients": inviteUserNames,
+          "subject": "Please join me on channel #"+req.params.id,
+          "body": "Hi, I'd like to invite you to join this channel so we can collaborate together blah blah blah, some link here"
+        };
+        //var postBody = "recipients=skasriel_buyer&subject=hello&body=test";
+        console.log("Strat="+strategy+" oauth="+strategy.oauth+" token="+strategy.token);
+        strategy.oauth.post('https://www.odesk.com/api/mc/v1/threads/'+req.user.username+'.json', strategy.token, strategy.tokenSecret, postBody, function(err, body, res) {
+          console.log("MC post: "+err+" "+JSON.stringify(body)+" "+res);
+        });
       }
 
       var room = Workroom.findById(req.params.id, function (err, room) {
