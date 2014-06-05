@@ -144,7 +144,27 @@ workroomControllers.controller('WorkroomDetailCtrl', ['$scope', '$rootScope', '$
         console.log('This is for my room -> refresh');
         $scope.getMessageList();
       }
+
+      // display a desktop notification
+      var notificationMessage = data.user+": "+data.message
+      var myNotification = new Notify(data.room, {
+        body: notificationMessage,
+        notifyShow: onNotifyShow,
+        permissionGranted: onGranted,
+        permissionDenied: onDenied
+      });
+      function onNotifyShow() {
+        console.log('notification was shown!');
+      }
+      function onGranted() {
+        console.log("permission granted");
+        myNotification.show();
+      }
+      function onDenied() {alert('permission denied');}
+      myNotification.show();
+
     });
+
     $scope.getMessageList();
 
 
@@ -263,7 +283,9 @@ workroomControllers.getOneOneRoomName = function(username1, username2) {
     return '@'+smaller+'-'+larger;
   }
 
-// Add a user to a room
+/**
+ Add a user to a room
+ */
 workroomControllers.controller('InviteUserController', ['$scope', '$rootScope', '$routeParams', '$http', '$window',
     function($scope, $rootScope, $routeParams, $http, $window) {
       $scope.inviteUsers = ['Loading'];
@@ -327,15 +349,6 @@ workroomControllers.controller('InviteUserController', ['$scope', '$rootScope', 
     function ($scope, $routeParams, $http) {
       $http.get('/api/user/my').success(function(data) {
         $scope.user = data;
-        /*username = data.username;
-        $scope.firstname = data.firstname;
-        $scope.lastname = data.lastname;
-        $scope.avatarURL = data.avatarURL;
-        $scope.userLocation = data.userLocation;
-        $scope.mobilePhone = data.mobilePhone;
-        $scope.twitterHandle = data.twitterHandle;
-        $scope.blurb = data.blurb;*/
-
         console.log("user data: "+data.username+" "+data.firstname+" "+data.lastname+" "+data.avatarURL);
 
         // manages file upload for avatar pic (TBD)
@@ -367,21 +380,9 @@ workroomControllers.controller('InviteUserController', ['$scope', '$rootScope', 
 
         // submit form
         $scope.PostUserSettings = function() {
-          $http.post('/api/user/my', $scope.user
-          /*{
-            'firstname': $scope.user.firstname,
-            'lastname' : $scope.user.lastname,
-            'displayname' : $scope.user.firstname + ' ' + $scope.user.lastname,
-            'title' : $scope.user.title,
-            'avatarURL' : $scope.user.avatarURL,
-            'userLocation' : $scope.user.userLocation,
-            'mobilePhone' : $scope.user.mobilePhone,
-            'twitterHandle' : $scope.user.twitterHandle,
-            'blurb': $scope.user.blurb
-          }*/
-          ).success(function(data, status, headers, config) {
+          $http.post('/api/user/my', $scope.user).success(function(data, status, headers, config) {
             console.log("success: updated profile");
-            //$window.location.reload(); // forcing a reload, because this scope isn't the right one and it's just easier that way...
+            // need to figure out the bootstrap way of notifying the user on the form that it got updated...
           }).error(function(data, status) {
             console.log("Post message error: "+status+" "+data.error);
           });
