@@ -135,7 +135,7 @@ module.exports.passport = function(passport) {
       console.log("verifying oDesk signin: "+profile.id+" "+profile.name.givenName+" "+profile.name.familyName);
       process.nextTick(function () {
 
-        // make the oauth info available for controllers who need to call the oDesk APIs (e.g. to send invitations via message center)   
+        // make the oauth info available for controllers who need to call the oDesk APIs (e.g. to send invitations via message center)
         var me = strat;
         me.profile = profile;
         me.oauth = profile.oauth;
@@ -194,9 +194,9 @@ module.exports.passport = function(passport) {
     module.exports.oDeskStrategy = strat;
 
 
-    // =========================================================================
-    // GOOGLE ==================================================================
-    // =========================================================================
+    /**
+    Google Strategy
+    */
     passport.use(new GoogleStrategy({
 
         clientID        : configAuth.googleAuth.clientID,
@@ -208,9 +208,10 @@ module.exports.passport = function(passport) {
     function(req, googleToken, refreshToken, profile, done) { // asynchronous
       process.nextTick(function() {
         console.log("Starting google strategy");
-        if (req.user) {
-          throw new Error("User is already logged in as: "+req.user.username);
-        }
+        /*if (req.user) {
+          console.log("User is already logged in as: "+req.user.username);
+          throw new Error("User is already logged in");
+        }*/
 
         // check if the user is already logged in
         User.findOne({ 'google.id' : profile.id }, function(err, user) {
@@ -220,26 +221,6 @@ module.exports.passport = function(passport) {
             if (user) {
               console.log("Found google user, ok: "+user.username+" "+user.displayname);
               return done(null, user);
-              /*
-                console.log("found google user: "+user);
-                // if there is a user id already but no token (user was linked at one point and then removed)
-                if (!user.google.token) {
-                  console.log("no google token: creating");
-                  user.google.token = googleToken;
-                  user.google.name  = profile.displayName;
-                  user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                  // come up with a username and display name based on data returned by google
-                  user.username = user.google.email;
-                  user.displayname = user.google.name;
-
-                  user.save(function(err) {
-                      if (err)
-                          throw err;
-                      console.log("saved user: "+user);
-                      return done(null, user);
-                  });
-                }*/
             } else {
               console.log("Creating user based on google info");
               var newUser          = new User();
@@ -259,8 +240,8 @@ module.exports.passport = function(passport) {
                 return done(null, newUser);
               });
 
-              // Pull google contact book!
-              var GoogleContacts = require('google-contacts').GoogleContacts;
+              // Pull google contact book! -- doesn't work yet, a lot more work would be needed here and I just didn't have time
+              /*var GoogleContacts = require('google-contacts').GoogleContacts;
               var c = new GoogleContacts({
                 token: googleToken
               });
@@ -270,11 +251,12 @@ module.exports.passport = function(passport) {
               c.on('contactsReceived', function (contacts) {
                 console.log('contacts: ' + contacts);
               });
-              /*c.on('contactGroupsReceived', function (contactGroups) {
+              c.on('contactGroupsReceived', function (contactGroups) {
                 console.log('groups: ' + contactGroups);
-              });*/
+              });
               c.getContacts('thin', 100);
-              //c.getContactGroups('thin', 200);
+              c.getContactGroups('thin', 200);
+              */
             }
         });
     });
